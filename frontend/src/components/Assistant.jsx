@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import api from '../api'
+import api, {playTTS} from '../api'
 
 /**
  * Assistant chat component.
@@ -17,6 +17,8 @@ export default function Assistant(){
   function pushMessage(role, text){
     const id = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
     setMessages(prev => [...prev, { id, role, text }])
+    if (role === "assistant")
+      playTTS(text).then();
   }
 
   // scroll to bottom when messages update
@@ -87,4 +89,5 @@ export default function Assistant(){
       </div>
     </div>
   )
+
 }

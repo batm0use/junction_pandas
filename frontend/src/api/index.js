@@ -14,6 +14,26 @@ export async function sendMessageToAssistant(message) {
   return res.data;
 }
 
+/**
+ * Send a message to the assistant backend endpoint.
+ * POST /api/assistant
+ * @param {string} message - user message text to send
+ * @returns {Promise<any>} - backend response body (often { response: string } or plain string)
+ */
+export async function playTTS(message) {
+    const res = await fetch(`${API_BASE}/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ "message": message }),
+    });
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.volume = 1;
+    return audio.play();
+  }
+
 
 // Send current location to backend and receive nearby places
 // Request: { lat: number, lng: number }
