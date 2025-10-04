@@ -1,4 +1,5 @@
 from database.query import position_by_id, what_you_need
+from database.distances_calculation import nearest_merchants
 from typing import Dict
 
 PERCENTAGE = 0.25
@@ -14,6 +15,9 @@ def nearby_locations(lat: float, lng: float, count: int = 3):
     """Return a small list of demo nearby points around the provided lat/lng.
     This is intentionally simple and deterministic for testing.
     """
+    list_merchants = nearest_merchants(lat, lng)
+    # (id, float)
+
     # create small offsets (roughly ~100m per 0.001 degree) around the point
     offsets = [(-0.001, -0.001), (0.0, 0.001), (0.001, 0.0)]
     results = []
