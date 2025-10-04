@@ -1,6 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+/**
+ * Simple leaderboard display component.
+ * @param {{items: Array<{id:number,name:string,score:number}>}} props
+ * @returns {JSX.Element}
+ */
 export default function Leaderboard({ items }){
   const list = Array.isArray(items) ? items : []
   return (

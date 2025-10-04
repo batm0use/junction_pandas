@@ -30,9 +30,9 @@ body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe
 
 /* Chat styles: center messages vertically and horizontally in the chat column */
 .assistant{display:flex;flex-direction:column;height:100%}
-.messages{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px}
-.msg{padding:8px 12px;border-radius:10px;margin:0;max-width:80%;width:auto;display:inline-block;align-self:flex-start;border:1px solid rgba(255,255,255,0.04);background:var(--panel)}
-.msg .msg-text{white-space:pre-wrap;display:inline}
+.messages{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;min-height:0}
+.msg{padding:8px 12px;border-radius:10px;margin:0;max-width:80%;width:auto;display:inline-block;align-self:flex-start;border:1px solid rgba(255,255,255,0.04);background:var(--panel);flex:0 0 auto;height:auto;min-height:0}
+.msg .msg-text{white-space:pre-wrap;display:block}
 .msg.user{background:linear-gradient(90deg, rgba(124,92,255,0.18), rgba(124,92,255,0.08));border-color:rgba(124,92,255,0.35);align-self:flex-end;color:#fff}
 .msg.assistant{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-color:rgba(255,255,255,0.04);align-self:flex-start;color:var(--text)}
 
@@ -41,6 +41,53 @@ body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe
 .compose textarea{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);resize:vertical;min-height:48px}
 .compose .compose-actions{display:flex;flex-direction:column;gap:6px}
 .compose .compose-actions button{padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff}
-.compose{display:flex;padding:8px;border-top:1px solid rgba(255,255,255,0.03)}
 .compose input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
 .compose button{margin-left:8px;padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff}
+
+/* Notifications (bottom-left) */
+.notifications-wrapper{position:fixed;left:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+.notification{background:linear-gradient(180deg,#042d18,#06321b);border-left:4px solid rgba(72,187,120,0.95);color:#dfffe6;padding:12px 14px;border-radius:8px;min-width:220px;box-shadow:0 8px 20px rgba(0,0,0,0.6);position:relative;transform:translateY(20px);opacity:0;animation:slideUpFade 360ms cubic-bezier(.22,.98,.24,1) forwards}
+.notification-title{font-weight:600;margin-bottom:4px}
+.notification-message{font-size:13px;color:#eaf9ee}
+.notification-close{position:absolute;right:8px;top:6px;background:transparent;border:none;color:#c9ffe0;font-size:16px;cursor:pointer}
+
+@keyframes slideUpFade{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Confirmation modal for Trigger break */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.confirm-modal {
+  background: linear-gradient(180deg, #07121a, #07121a);
+  color: var(--text);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  width: 320px;
+  max-width: calc(100% - 40px);
+  text-align: center;
+}
+.confirm-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.confirm-actions .btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: inherit;
+  cursor: pointer;
+}
+.confirm-actions .btn:hover { opacity: 0.95 }
