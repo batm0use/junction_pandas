@@ -6,12 +6,12 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-_pycache_/
-backend/_pycache_/
-backend/controller/_pycache_/
-backend/router/_pycache_/
-database/_pycache_/
-_pycache_/
+__pycache__/
+backend/__pycache__/
+backend/controller/__pycache__/
+backend/router/__pycache__/
+database/__pycache__/
+__pycache__/
 *.py[cod]
 
 # --------------

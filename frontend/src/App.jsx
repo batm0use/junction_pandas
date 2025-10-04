@@ -12,20 +12,20 @@ export default function App(){
         <Leaderboard />
       </aside>
 
-      <main className="main">
-        <header className="topbar">
-          <h1>Junction Dashboard</h1>
-          <Controls />
-        </header>
+      <div className="topbar">
+        <h1>Junction Dashboard</h1>
+        <Controls />
+      </div>
 
-        <section className="map-area">
+      <div className="main">
+        <div className="map-area">
           <MapView />
-        </section>
+        </div>
+      </div>
 
-        <section className="assistant-area">
-          <Assistant />
-        </section>
-      </main>
+      <div className="assistant-area">
+        <Assistant />
+      </div>
     </div>
   )
 }

@@ -1,18 +1,10 @@
 import sqlite3
 import pandas as pd
+from database.initializer import get_id
 
-conn = sqlite3.connect("uber.db")
-cursor = conn.cursor()
-
-# Prepared statement (parameterized query)
-query = "SELECT * FROM earners WHERE earner_id = ? LIMIT ?"
-
-# Example parameters
-earner_id = "E10000"
-
-limit = 5
 
 def drives_per_one_driver(id):
+    cursor = get_id()
     group_drives = f"SELECT COUNT(ride_id) FROM rides_trips WHERE driver_id= ? GROUP BY driver_id"
     cursor.execute(group_drives, (id,))
     res = cursor.fetchall()
@@ -21,6 +13,7 @@ def drives_per_one_driver(id):
 
 #returns number of drivers in DB
 def count_drivers():
+    cursor = get_id()
     num_drivers= f"SELECT COUNT(DISTINCT earner_id) FROM earners WHERE earner_type=?"
     cursor.execute(num_drivers, ("driver",))
     res = cursor.fetchall()
@@ -28,6 +21,7 @@ def count_drivers():
 
 #returns number of couriers in DB
 def count_couriers():
+    cursor = get_id()
     num_drivers= f"SELECT COUNT(DISTINCT earner_id) FROM earners WHERE earner_type=?"
     cursor.execute(num_drivers, ("courier",))
     res = cursor.fetchall()
@@ -35,6 +29,7 @@ def count_couriers():
 
 
 def cutoff(percentage):
+    cursor = get_id()
     cutoff = round(percentage * count_drivers())
     query_top_per= f"SELECT COUNT(ride_id) FROM rides_trips GROUP BY driver_id ORDER BY COUNT(ride_id) DESC LIMIT ?"
     cursor.execute(query_top_per, (cutoff,))
@@ -43,6 +38,7 @@ def cutoff(percentage):
     return res[cutoff-1][0]
 
 def position_by_id(driver_id):
+    cursor = get_id()
     drives= drives_per_one_driver(driver_id)
 
     _query = f"SELECT COUNT(ride_id) FROM rides_trips GROUP BY driver_id HAVING COUNT(ride_id) > ?"
@@ -52,6 +48,7 @@ def position_by_id(driver_id):
     return len(res)+1
 
 def what_you_need(driver_id, percentage):
+    cursor = get_id()
     current_drives= drives_per_one_driver(driver_id)
     goal= cutoff(percentage)
 
@@ -67,4 +64,3 @@ def what_you_need(driver_id, percentage):
 #for row in rows:
 #    print(row)
 
-conn.close()
