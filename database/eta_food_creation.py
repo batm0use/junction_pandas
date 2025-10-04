@@ -40,7 +40,7 @@ def get_eta_for_food_by_merchant(merchant):
     min_etas = []
     max_etas = []
 
-    if(rows.length == 0): return -1
+    if(len(rows) == 0): return -1
 
     for i, delivery in enumerate(rows):
         vehicle = delivery[0]
