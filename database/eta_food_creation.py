@@ -22,6 +22,15 @@ def calculate_eta(distance, time, velocity, fcc):
 
 query = ("SELECT vehicle_type, distance_km, duration_mins FROM eats_orders WHERE merchant_id = ?")
 
+def get_restaurant_info():
+    cursor = get_id()
+
+    query1 = ("SELECT merchant_id, lat, lon  FROM merchants")
+
+    cursor.execute(query1)
+    rows = cursor.fetchall()
+    return rows
+
 def get_eta_for_food_by_merchant(merchant):
     cursor = get_id()
 
@@ -31,7 +40,7 @@ def get_eta_for_food_by_merchant(merchant):
     min_etas = []
     max_etas = []
 
-    if(rows.length == 0): return -1
+    if(len(rows) == 0): return -1
 
     for i, delivery in enumerate(rows):
         vehicle = delivery[0]

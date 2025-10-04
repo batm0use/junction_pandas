@@ -1,8 +1,9 @@
 from database.query import position_by_id, what_you_need, top_drivers, calculate_percentile
 from database.distances_calculation import nearest_merchants
+from database.eta_food_creation import get_restaurant_info
 from typing import Dict
 
-PERCENTAGE = 0.05
+PERCENTAGE = 0.25
 
 def find_position(id: str) -> Dict[str, int]:
     return {"position" : position_by_id(id)}
@@ -42,3 +43,10 @@ def leaderboard_scores() -> list[int]:
     list_scores = top_drivers()
     list_scores.sort(reverse=True)
     return list_scores
+
+def restaurants():
+    # returns list of truples
+    out = get_restaurant_info()
+
+    return out
+
