@@ -3,7 +3,7 @@ from backend.controller.controller import find_position, remaining_rides, nearby
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
-
+from backend.controller.tts_controller import process_tts
 
 router = APIRouter(prefix="/api", tags=["api"])
 
@@ -72,4 +72,10 @@ async def rides_left(id: str):
     # Request: path param 'id' (string)
     # Response: remaining rides/count info for the id (implementation-specific)
     return remaining_rides(id)
+
+@router.post("/tts")
+async def generate_tts(text: Item):
+    text = text.message
+    reply = process_tts(text)
+    return reply
 
