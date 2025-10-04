@@ -30,10 +30,17 @@ body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe
 
 /* Chat styles: center messages vertically and horizontally in the chat column */
 .assistant{display:flex;flex-direction:column;height:100%}
-.messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.msg{padding:12px;border-radius:10px;margin:8px 0;max-width:90%;width:auto}
-.msg.user{background:rgba(255,255,255,0.05);align-self:center}
-.msg.assistant{background:rgba(124,92,255,0.12);align-self:center}
+.messages{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}
+.msg{padding:12px;border-radius:10px;margin:6px 0;max-width:80%;width:fit-content;border:1px solid rgba(255,255,255,0.04);background:var(--panel)}
+.msg .msg-text{white-space:pre-wrap}
+.msg.user{background:linear-gradient(90deg, rgba(124,92,255,0.18), rgba(124,92,255,0.08));border-color:rgba(124,92,255,0.35);align-self:flex-end;color:#fff}
+.msg.assistant{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-color:rgba(255,255,255,0.04);align-self:flex-start;color:var(--text)}
+
+/* compose area layout */
+.compose{display:flex;gap:8px;padding:8px;border-top:1px solid rgba(255,255,255,0.03);align-items:flex-end}
+.compose textarea{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);resize:vertical;min-height:48px}
+.compose .compose-actions{display:flex;flex-direction:column;gap:6px}
+.compose .compose-actions button{padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff}
 .compose{display:flex;padding:8px;border-top:1px solid rgba(255,255,255,0.03)}
 .compose input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
 .compose button{margin-left:8px;padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff}
