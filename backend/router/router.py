@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations
-from database.query import *
+# keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 
 

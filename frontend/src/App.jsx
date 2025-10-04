@@ -28,12 +28,7 @@ function getBrowserLocation(timeout = 5000){
 }
 
 async function fetchBackendLocation(){
-  try{
-    const loc = await api.getMyLocation()
-    if (loc?.lat && loc?.lng) return { lat: loc.lat, lng: loc.lng }
-  }catch(e){
-    console.warn('Backend my_location failed', e)
-  }
+  // removed: deprecated backend location helper - frontend now prefers browser geolocation
   return null
 }
 

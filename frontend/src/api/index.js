@@ -38,28 +38,6 @@ export async function sendNearbyPlacesRequest(location){
 }
 
 /**
- * Deprecated compatibility helper
- * GET /api/my_location
- * Request: none
- * Response: { lat:number, lng:number }  or null
- */
-export async function getMyLocation() {
-  const res = await axios.get(`${API_BASE}/my_location`);
-  return res.data;
-}
-
-/**
- * Deprecated compatibility helper
- * GET /api/nearby_places
- * Request: none
- * Response: array of places (see POST /api/nearby_places for preferred contract)
- */
-export async function getNearbyPlaces() {
-  const res = await axios.get(`${API_BASE}/nearby_places`);
-  return res.data;
-}
-
-/**
  * GET /api/leaderboard
  * Request: none
  * Response: Array of leaderboard items: [ { id, name, score } ]
