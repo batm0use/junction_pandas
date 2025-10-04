@@ -11,9 +11,10 @@ class Item(BaseModel):
 
 
 @router.post("/assistant")
-async def chat(message : Item):
-    print(message)
-    return
+async def chat(message: Item):
+    text = message.message
+    reply = f"I got the {text}"
+    return {"response": reply}
 
 @router.get("/health")
 async def health():
