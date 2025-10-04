@@ -3,11 +3,18 @@ import MapView from './components/MapView'
 import Assistant from './components/Assistant'
 import Leaderboard from './components/Leaderboard'
 import Controls from './components/Controls'
+import Notifications from './components/Notifications'
 import api from './api'
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
 
-// Try to get location from browser geolocation (promise)
+/**
+ * Try to get the user's current location from the browser Geolocation API.
+ * Returns a Promise that resolves with an object { lat, lng } on success.
+ * Rejects with an Error when geolocation is unavailable or the request times out.
+ * @param {number} [timeout=5000] - milliseconds before the request is considered failed
+ * @returns {Promise<{lat:number,lng:number}>}
+ */
 function getBrowserLocation(timeout = 5000){
   if (!navigator?.geolocation) return Promise.reject(new Error('Geolocation not available'))
 
@@ -27,15 +34,12 @@ function getBrowserLocation(timeout = 5000){
   })
 }
 
-async function fetchBackendLocation(){
-  // removed: deprecated backend location helper - frontend now prefers browser geolocation
-  return null
-}
-
 export default function App(){
   const [myLocation, setMyLocation] = useState(null)
   const [nearby, setNearby] = useState([])
   const [leaderboard, setLeaderboard] = useState([])
+  const [notifications, setNotifications] = useState([])
+  const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
 
   useEffect(() => {
@@ -52,24 +56,13 @@ export default function App(){
           return DEFAULT_LOCATION
     }
 
-    async function fetchNearbyForLocation(location){
-      try{
-        const places = await api.sendNearbyPlacesRequest(location)
-        return Array.isArray(places) ? places : []
-      }catch(e){
-        console.warn('Failed to fetch nearby places with POST', e)
-        return []
-      }
-    }
-
     async function init(){
       try{
         const location = await determineInitialLocation()
         if(!mounted) return
         setMyLocation(location)
 
-        const places = await fetchNearbyForLocation(location)
-        if(mounted) setNearby(places.map(p => ({ id: p.id, lat: p.lat ?? p.y ?? p[1], lng: p.lng ?? p.x ?? p[0], name: p.name })))
+        // Do NOT fetch nearby places automatically — wait for user to click Refresh Nearby
 
         const lb = await api.getLeaderboard()
         if(mounted) setLeaderboard(Array.isArray(lb) ? lb : [])
@@ -83,15 +76,84 @@ export default function App(){
     return () => { mounted = false }
   }, [])
 
-  // refresh handler to request nearby places again using current myLocation
+  /**
+   * Fetch nearby places for the current `myLocation` by POSTing to the backend.
+   * On success updates `nearby` state and shows a notification.
+   * If there is no known `myLocation`, this function is a no-op.
+   * @returns {Promise<void>}
+   */
   async function refreshNearby(){
     if(!myLocation) return
     try{
       const places = await api.sendNearbyPlacesRequest(myLocation)
       setNearby(Array.isArray(places) ? places.map(p => ({ id: p.id, lat: p.lat ?? p.y ?? p[1], lng: p.lng ?? p.x ?? p[0], name: p.name })) : [])
+      showNotification('Nearby updated', `Found ${places.length} places near you`)
     }catch(e){
       console.warn('Refresh nearby failed', e)
+      showNotification('Nearby failed', 'Could not fetch nearby places')
     }
+  }
+
+  /**
+   * Re-run browser geolocation to refresh `myLocation` and show a notification.
+   * @returns {Promise<void>}
+   */
+  async function refreshLocation(){
+    try{
+      const loc = await getBrowserLocation(5000)
+      setMyLocation(loc)
+      showNotification('Location updated', `Lat ${loc.lat.toFixed(4)}, Lng ${loc.lng.toFixed(4)}`)
+    }catch(e){
+      console.warn('Refresh location failed', e)
+      showNotification('Location failed', 'Could not update location')
+    }
+  }
+
+  /**
+   * Open the 'take a break' confirmation modal.
+   * If the user confirms, it triggers refreshNearby().
+   */
+  function triggerBreak(){
+    setConfirmOpen(true)
+  }
+
+  /**
+   * Called when the confirmation modal is answered.
+   * @param {boolean} confirmed - true if user clicked Yes, false if No
+   */
+  function handleConfirm(confirmed){
+    setConfirmOpen(false)
+    if(confirmed){
+      refreshNearby()
+    }
+  }
+
+  /**
+   * Push a new notification into the notifications list.
+   * @param {{title:string,message:string}} item - notification payload
+   * @returns {string} id - unique id for the created notification
+   */
+  function pushNotification(item){
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
+    setNotifications(prev => [...prev, { id, ...item }])
+    return id
+  }
+
+  /**
+   * Convenience wrapper to push a simple title/message notification.
+   * @param {string} title
+   * @param {string} message
+   */
+  function showNotification(title, message){
+    pushNotification({ title, message })
+  }
+
+  /**
+   * Remove a notification by id.
+   * @param {string} id
+   */
+  function closeNotification(id){
+    setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
   return (
@@ -102,8 +164,8 @@ export default function App(){
       </aside>
 
       <div className="topbar">
-        <h1>Junction Dashboard</h1>
-  <Controls onRefreshNearby={refreshNearby} />
+    <h1>Junction Dashboard</h1>
+  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} />
       </div>
 
       <div className="main">
@@ -115,6 +177,19 @@ export default function App(){
       <div className="assistant-area">
         <Assistant />
       </div>
+      <Notifications items={notifications} onClose={closeNotification} />
+
+      {confirmOpen && (
+        <div className="confirm-overlay">
+          <div className="confirm-modal">
+            <div className="confirm-title">You want to take a break?</div>
+            <div className="confirm-actions">
+              <button className="btn" onClick={() => handleConfirm(false)}>No</button>
+              <button className="btn" onClick={() => handleConfirm(true)}>Yes</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

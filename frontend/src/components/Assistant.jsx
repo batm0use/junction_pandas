@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import api from '../api'
 
+/**
+ * Assistant chat component.
+ * Handles composing messages, sending them to the assistant API, and rendering replies.
+ * @returns {JSX.Element}
+ */
 export default function Assistant(){
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])

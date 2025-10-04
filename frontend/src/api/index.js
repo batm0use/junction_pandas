@@ -4,14 +4,10 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
 
 
 /**
+ * Send a message to the assistant backend endpoint.
  * POST /api/assistant
- * Request: { message: string }
- *   - message: the user text to send to the assistant
- * Response (frontend expectation):
- *   - Preferred: { response: string }
- *   - Accepts: server may also return a plain string or other object with a text response
- * Example request body: { "message": "Hello" }
- * Example response: { "response": "I got the Hello" }
+ * @param {string} message - user message text to send
+ * @returns {Promise<any>} - backend response body (often { response: string } or plain string)
  */
 export async function sendMessageToAssistant(message) {
   const res = await axios.post(`${API_BASE}/assistant`, { "message": message });
@@ -32,16 +28,21 @@ export async function sendMessageToAssistant(message) {
  * Example request body: { "lat": 51.9995, "lng": 4.3625 }
  * Example response: [ { "id": 101, "lat": 51.9996, "lng": 4.3626, "name": "Demo Spot" } ]
  */
+/**
+ * Send current coordinates to the backend and receive nearby places.
+ * POST /api/nearby_places
+ * @param {{lat:number,lng:number}} location - user's current coordinates
+ * @returns {Promise<Array>} - array of places (preferred shape: [{ id, lat, lng, name }, ...])
+ */
 export async function sendNearbyPlacesRequest(location){
   const res = await axios.post(`${API_BASE}/nearby_places`, location)
   return res.data
 }
 
 /**
+ * Fetch the leaderboard from the backend.
  * GET /api/leaderboard
- * Request: none
- * Response: Array of leaderboard items: [ { id, name, score } ]
- * Example: [ { id: 1, name: 'Electra', score: 420 } ]
+ * @returns {Promise<Array<{id:number,name:string,score:number}>>}
  */
 export async function getLeaderboard() {
   const res = await axios.get(`${API_BASE}/leaderboard`);
