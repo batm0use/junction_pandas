@@ -36,6 +36,7 @@ export default function Assistant({ extraContent }){
     if(!trimmed.trim()) return
     setLoading(true)
     pushMessage('user', input)
+    setInput('')
     try{
       const resp = await api.sendMessageToAssistant(input)
       // backend may return either a string or an object like { response: '...' }
@@ -51,7 +52,6 @@ export default function Assistant({ extraContent }){
       console.error(e)
     }finally{
       setLoading(false)
-      setInput('')
     }
   }
 
