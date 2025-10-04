@@ -54,8 +54,27 @@ export async function getLeaderboardSummary(userId) {
   return await response.json()
 }
 
+/**
+ * Play text-to-speech via backend TTS endpoint. Returns a Promise that resolves when playback starts.
+ * @param {string} message
+ */
+export async function playTTS(message) {
+  const res = await fetch(`${API_BASE}/tts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  })
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const audio = new Audio(url)
+  audio.volume = 1
+  return audio.play()
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
   getLeaderboard,
+  getLeaderboardSummary,
+  playTTS,
 };
