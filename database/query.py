@@ -58,14 +58,13 @@ def what_you_need(driver_id, percentage):
     return goal-current_drives
 
 
-cursor.execute(query, (earner_id, limit))
-print(drives_per_one_driver("E10000777"))
-print(count_drivers())
-print(cutoff(0.25))
-print(position_by_id("E10000"))
-rows = cursor.fetchall()
+#print(drives_per_one_driver("E10000777"))
+#print(count_drivers())
+#print(cutoff(0.25))
+#print(position_by_id("E10000"))
+#rows = cursor.fetchall()
 
-for row in rows:
-    print(row)
+#for row in rows:
+#    print(row)
 
 conn.close()
