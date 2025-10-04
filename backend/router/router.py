@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from controller.controller import get_health, greet_user
 
-router = APIRouter(prefix="/api", tags=["api"])
+router = APIRouter( tags=["api"])
 
 
 @router.get("/health")
