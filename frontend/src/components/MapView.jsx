@@ -5,6 +5,11 @@ import 'leaflet/dist/leaflet.css'
 
 const DELFT_CENTER = [51.9995, 4.3625]
 
+/**
+ * Helper component that instructs the leaflet map to fly to a given location.
+ * @param {{location:{lat:number,lng:number}}} props
+ * @returns {null}
+ */
 function FlyToLocation({ location }){
   const map = useMap()
 
@@ -21,6 +26,11 @@ FlyToLocation.propTypes = {
   location: PropTypes.shape({ lat: PropTypes.number, lng: PropTypes.number }),
 }
 
+/**
+ * MapView component - renders a Leaflet map, markers for nearby points and the user's location.
+ * @param {{myLocation:{lat:number,lng:number}, points:Array<{id:number,lat:number,lng:number,name:string}>}} props
+ * @returns {JSX.Element}
+ */
 export default function MapView({ myLocation, points }){
   const center = myLocation ? [myLocation.lat, myLocation.lng] : DELFT_CENTER
 

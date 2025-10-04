@@ -4,8 +4,20 @@ from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(title="Backend API")
+
+# Allow CORS so the frontend (dev server or built assets) can make POST requests and OPTIONS preflights.
+# In development you may want to restrict origins to your dev server (e.g. http://localhost:5173).
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["GET", "POST", "OPTIONS"],
+  allow_headers=["*"],
+)
 
 # Mount the frontend build (Vite -> dist) at root if present. This lets the SPA handle client-side routes.
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
