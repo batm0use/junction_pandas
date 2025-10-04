@@ -47,20 +47,14 @@ export default function App(){
     let mounted = true
 
     async function determineInitialLocation(){
-      // Prefer browser-provided location, then backend, then default
-      try{
-        const location = await getBrowserLocation(5000)
-        return location
-      }catch(err){
-        console.warn('Browser geolocation failed, falling back to backend', err)
-        try{
-          const loc = await api.getMyLocation()
-          if (loc?.lat && loc?.lng) return { lat: loc.lat, lng: loc.lng }
-        }catch(apiErr){
-          console.warn('Backend my_location failed', apiErr)
-        }
-      }
-      return DEFAULT_LOCATION
+          // Prefer browser-provided location, otherwise use default.
+          try{
+            const location = await getBrowserLocation(5000)
+            return location
+          }catch(err){
+            console.warn('Browser geolocation failed — using default location', err)
+          }
+          return DEFAULT_LOCATION
     }
 
     async function fetchNearbyForLocation(location){
@@ -68,14 +62,8 @@ export default function App(){
         const places = await api.sendNearbyPlacesRequest(location)
         return Array.isArray(places) ? places : []
       }catch(e){
-        console.warn('Failed to fetch nearby places with POST, falling back to GET', e)
-        try{
-          const places = await api.getNearbyPlaces()
-          return Array.isArray(places) ? places : []
-        }catch(inner){
-          console.warn('Fallback GET nearby failed', inner)
-          return []
-        }
+        console.warn('Failed to fetch nearby places with POST', e)
+        return []
       }
     }
 
@@ -120,7 +108,7 @@ export default function App(){
 
       <div className="topbar">
         <h1>Junction Dashboard</h1>
-  <Controls setMyLocation={setMyLocation} onRefreshNearby={refreshNearby} />
+  <Controls onRefreshNearby={refreshNearby} />
       </div>
 
       <div className="main">
