@@ -6,15 +6,17 @@ const sample = [
   { id: 3, name: 'Carol', score: 90 },
 ]
 
-export default function Leaderboard(){
+export default function Leaderboard({ items }){
+  const list = Array.isArray(items) && items.length ? items : sample
   return (
     <div className="leaderboard">
-      {sample.map(p => (
+      {list.map(p => (
         <div key={p.id} className="player">
           <div className="name">{p.name}</div>
-          <div className="score">{p.score}</div>
+          <div className="score">{p.score ?? p.points ?? ''}</div>
         </div>
       ))}
     </div>
   )
 }
+
