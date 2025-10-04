@@ -39,6 +39,52 @@ async def nearby_places(payload: LocationPayload):
     return nearby_locations(payload.lat, payload.lng, count=5)
 
 
+@router.post("/deliveries")
+async def deliveries(payload: LocationPayload):
+    # POST /api/deliveries
+    # Server receives: { lat: float, lng: float }
+    # Response: an array of delivery objects with eta and pickup/drop coordinates.
+    # For now return a hardcoded/demo list using small offsets from the provided coords.
+    base_lat = payload.lat
+    base_lng = payload.lng
+    demo = [
+        {
+            "id": 101,
+            "name": "Bistro A",
+            "eta_food": 12,
+            "eta_arrive": 25,
+            "lat_pickup": base_lat + 0.0012,
+            "lng_pickup": base_lng + 0.0008,
+            "lat_drop": base_lat - 0.0006,
+            "lng_drop": base_lng + 0.0014,
+            "extra_info": "Main square, left of the fountain"
+        },
+        {
+            "id": 102,
+            "name": "Sushi Place",
+            "eta_food": 8,
+            "eta_arrive": 18,
+            "lat_pickup": base_lat + 0.0004,
+            "lng_pickup": base_lng - 0.0011,
+            "lat_drop": base_lat + 0.0009,
+            "lng_drop": base_lng - 0.0003,
+            "extra_info": "Apartment block B, intercom 203"
+        },
+        {
+            "id": 103,
+            "name": "Pizzeria",
+            "eta_food": 20,
+            "eta_arrive": 35,
+            "lat_pickup": base_lat - 0.0010,
+            "lng_pickup": base_lng - 0.0007,
+            "lat_drop": base_lat - 0.0015,
+            "lng_drop": base_lng + 0.0002,
+            "extra_info": "Behind the bakery, call on arrival"
+        }
+    ]
+    return demo
+
+
 @router.get("/leaderboard")
 async def leaderboard():
     # GET /api/leaderboard

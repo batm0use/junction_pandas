@@ -31,7 +31,7 @@ FlyToLocation.propTypes = {
  * @param {{myLocation:{lat:number,lng:number}, points:Array<{id:number,lat:number,lng:number,name:string}>}} props
  * @returns {JSX.Element}
  */
-export default function MapView({ myLocation, points }){
+export default function MapView({ myLocation, points, selectedDelivery }){
   const center = myLocation ? [myLocation.lat, myLocation.lng] : DELFT_CENTER
 
   const renderPoints = points?.length ? points : []
@@ -56,7 +56,25 @@ export default function MapView({ myLocation, points }){
           </CircleMarker>
         )}
 
+        {/* Selected delivery pickup/drop markers */}
+        {selectedDelivery && (
+          <>
+            <CircleMarker center={[selectedDelivery.lat_pickup, selectedDelivery.lng_pickup]} radius={8} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: 0.95 }}>
+              <Popup>Pickup: {selectedDelivery.name}</Popup>
+            </CircleMarker>
+            <CircleMarker center={[selectedDelivery.lat_drop, selectedDelivery.lng_drop]} radius={8} pathOptions={{ color: 'orange', fillColor: 'orange', fillOpacity: 0.95 }}>
+              <Popup>Drop: {selectedDelivery.name}</Popup>
+            </CircleMarker>
+          </>
+        )}
+
+        {/* Fly to user's location by default */}
         <FlyToLocation location={myLocation} />
+
+        {/* When a delivery is selected, fly to the pickup location */}
+        {selectedDelivery && (
+          <FlyToLocation location={{ lat: selectedDelivery.lat_pickup, lng: selectedDelivery.lng_pickup }} />
+        )}
       </MapContainer>
     </div>
   )
@@ -65,9 +83,11 @@ export default function MapView({ myLocation, points }){
 MapView.propTypes = {
   myLocation: PropTypes.shape({ lat: PropTypes.number, lng: PropTypes.number }),
   points: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), lat: PropTypes.number, lng: PropTypes.number, name: PropTypes.string })),
+  selectedDelivery: PropTypes.shape({ id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, eta_food: PropTypes.number, eta_arrive: PropTypes.number, lat_pickup: PropTypes.number, lng_pickup: PropTypes.number, lat_drop: PropTypes.number, lng_drop: PropTypes.number, extra_info: PropTypes.string }),
 }
 
 MapView.defaultProps = {
   myLocation: null,
   points: null,
+  selectedDelivery: null,
 }
