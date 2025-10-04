@@ -30,7 +30,7 @@ def nearest_merchants(lat1,lon1):
 
         distance = haversine(lat1, lon1, lat, lon)
 
-        merchants.append([merchant, distance])
+        merchants.append([merchant, distance, lat, lon])
 
     merchants = sorted(merchants, key = lambda x: x[1])
     res= list(filter(lambda x: x[1]<=10, merchants))

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.controller.controller import find_position, remaining_rides, nearby_locations
+from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
@@ -45,14 +45,18 @@ async def leaderboard():
     # Request: none
     # Response: Array of leaderboard items: [ { id, name, score } ]
     # Example response: [ { "id": 1, "name": "Electra", "score": 420 } ]
-    return [
-        {"id": 1, "name": "Electra", "score": 420},
-        {"id": 2, "name": "Gian", "score": 69},
-        {"id": 3, "name": "Victor", "score": 50},
-        {"id": 4, "name": "Oleg", "score": 10},
-        {"id": 5, "name": "Kuba", "score": -1},
-
+    scores = leaderboard_scores()
+    data = [
+        {"id": 1, "name": "Electra", "score": "x"},
+        {"id": 2, "name": "Gian", "score": "x"},
+        {"id": 3, "name": "Victor", "score": "x"},
+        {"id": 4, "name": "Oleg", "score": "x"},
+        {"id": 5, "name": "Kuba", "score": "x"},
     ]
+
+    for d, s in zip(data, scores):
+        d["score"] = s
+    return data
 
 
 @router.get("/position/{id}")

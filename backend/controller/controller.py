@@ -1,4 +1,5 @@
-from database.query import position_by_id, what_you_need
+from database.query import position_by_id, what_you_need, top_drivers
+from database.distances_calculation import nearest_merchants
 from typing import Dict
 
 PERCENTAGE = 0.25
@@ -14,14 +15,22 @@ def nearby_locations(lat: float, lng: float, count: int = 3):
     """Return a small list of demo nearby points around the provided lat/lng.
     This is intentionally simple and deterministic for testing.
     """
-    # create small offsets (roughly ~100m per 0.001 degree) around the point
-    offsets = [(-0.001, -0.001), (0.0, 0.001), (0.001, 0.0)]
+    list_merchants = nearest_merchants(lat, lng)
+    # [id, dist, lat, long] 
+
     results = []
-    for i, (dy, dx) in enumerate(offsets[:count], start=1):
+    for i, x in enumerate(list_merchants):
+        if i > count:
+            break
         results.append({
-            "id": i,
-            "lat": round(lat + dy, 7),
-            "lng": round(lng + dx, 7),
+            "id": x[0],
+            "lat": round(x[2], 7),
+            "lng": round(x[3], 7),
             "name": f"Nearby {i}"
         })
     return results
+
+def leaderboard_scores() -> list[int]:
+    list_scores = top_drivers()
+    list_scores.sort(reverse=True)
+    return list_scores
