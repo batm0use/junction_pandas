@@ -7,9 +7,6 @@ import axios from "axios";
 
   Endpoints used by the frontend (expected shapes):
 
-  GET /api/health
-    - Request: none
-    - Response: { status: 'ok' }  (or any health object)
 
   POST /api/assistant
     - Request body: { message: string }
@@ -40,28 +37,57 @@ import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
 
+/**
+ * GET /api/health
+ * Request: none
+ * Response: object - health/status info from the server. Example: { status: 'ok' }
+ * Notes: lightweight health check used by the frontend to verify the backend is reachable.
+ */
 export async function getHealth() {
   const res = await axios.get(`${API_BASE}/health`);
   return res.data;
 }
 
+/**
+ * POST /api/assistant
+ * Request: { message: string }
+ *   - message: the user text to send to the assistant
+ * Response (frontend expectation):
+ *   - Preferred: { response: string }
+ *   - Accepts: server may also return a plain string or other object with a text response
+ * Example request body: { "message": "Hello" }
+ * Example response: { "response": "I got the Hello" }
+ */
 export async function sendMessageToAssistant(message) {
-  // Request: { message: string }
-  // Response: ideally { response: string } but server might return a plain string
   const res = await axios.post(`${API_BASE}/assistant`, { "message": message });
   return res.data;
 }
 
 // New API placeholders
+/**
+ * GET /api/my_location
+ * Request: none
+ * Response (frontend expectation):
+ *   - { lat: number, lng: number }
+ *   - Example: { "lat": 51.9995, "lng": 4.3625 }
+ *   - May also return null/empty if server cannot determine a location
+ */
 export async function getMyLocation() {
-  // Response expected: { lat: number, lng: number } or null
-  // Example: { lat: 51.9995, lng: 4.3625 }
   const res = await axios.get(`${API_BASE}/my_location`);
   return res.data;
 }
 
+/**
+ * GET /api/nearby_places  (deprecated for the primary workflow)
+ * Request: none
+ * Response (frontend expectation): Array of place objects in flexible shapes. Examples supported:
+ *   - { id, lat, lng, name }
+ *   - { id, x, y, name }   (x -> lng, y -> lat)
+ *   - Minimal coordinate tuple inside object (uncommon)
+ * Example response: [{ "id": 1, "lat": 51.9991, "lng": 4.3620, "name": "Cafe" }]
+ * Notes: prefer POST /api/nearby_places with client's location for more accurate results.
+ */
 export async function getNearbyPlaces() {
-  // Deprecated: use sendNearbyPlacesRequest with a location payload.
   const res = await axios.get(`${API_BASE}/nearby_places`);
   return res.data;
 }
@@ -69,13 +95,28 @@ export async function getNearbyPlaces() {
 // Send current location to backend and receive nearby places
 // Request: { lat: number, lng: number }
 // Response: [{ id, lat, lng, name }, ...]
+/**
+ * POST /api/nearby_places
+ * Request body: { lat: number, lng: number }
+ *   - lat: latitude of the user's current location
+ *   - lng: longitude of the user's current location
+ * Response (frontend expectation): Array of nearby places, each with coordinates and a name. Preferred shape:
+ *   - [{ id, lat, lng, name }, ...]
+ * Example request body: { "lat": 51.9995, "lng": 4.3625 }
+ * Example response: [ { "id": 101, "lat": 51.9996, "lng": 4.3626, "name": "Demo Spot" } ]
+ */
 export async function sendNearbyPlacesRequest(location){
   const res = await axios.post(`${API_BASE}/nearby_places`, location)
   return res.data
 }
 
+/**
+ * GET /api/leaderboard
+ * Request: none
+ * Response: Array of leaderboard items: [ { id, name, score } ]
+ * Example: [ { id: 1, name: 'Electra', score: 420 } ]
+ */
 export async function getLeaderboard() {
-  // response: array like this: [ { id, name, score } ]
   const res = await axios.get(`${API_BASE}/leaderboard`);
   return res.data;
 }

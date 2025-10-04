@@ -12,19 +12,21 @@ class Item(BaseModel):
 
 @router.post("/assistant")
 async def chat(message: Item):
+    # POST /api/assistant
+    # Server receives: Item { message: str }
+    # Server responds: { response: str }
+    # Example request: { "message": "Hello" }
+    # Example response: { "response": "I got the Hello" }
     text = message.message
     reply = f"I got the {text}"
     return {"response": reply}
 
 @router.get("/health")
 async def health():
+    # GET /api/health
+    # Request: none
+    # Response: server health/status object. Example: { "status": "ok" }
     return get_health()
-
-
-@router.get("/my_location")
-async def my_location():
-    # Hardcoded demo location (Delft)
-    return {"lat": 51.9995, "lng": 4.3625}
 
 
 class LocationPayload(BaseModel):
@@ -34,23 +36,21 @@ class LocationPayload(BaseModel):
 
 @router.post("/nearby_places")
 async def nearby_places(payload: LocationPayload):
-    # Generate demo nearby points relative to provided lat/lng
+    # POST /api/nearby_places
+    # Server receives: { lat: float, lng: float }
+    #   - lat/lng: client's current coordinates
+    # Server responds: Array of place objects. Example:
+    # [ { "id": 1, "lat": 51.9996, "lng": 4.3626, "name": "Spot 1" }, ... ]
+    # This route generates demo points around the provided coordinates.
     return nearby_locations(payload.lat, payload.lng, count=5)
-
-
-@router.get("/nearby_places")
-async def nearby_places_get():
-    # Backwards-compatible GET that returns sample data.
-    return [
-        {"id": 1, "lat": 51.9991, "lng": 4.3620, "name": "Cafe Delft"},
-        {"id": 2, "lat": 51.9997, "lng": 4.3630, "name": "Delft Station"},
-        {"id": 3, "lat": 51.9999, "lng": 4.3629, "name": "Prostitutes"},
-    ]
 
 
 @router.get("/leaderboard")
 async def leaderboard():
-    # Hardcoded leaderboard sample
+    # GET /api/leaderboard
+    # Request: none
+    # Response: Array of leaderboard items: [ { id, name, score } ]
+    # Example response: [ { "id": 1, "name": "Electra", "score": 420 } ]
     return [
         {"id": 1, "name": "Electra", "score": 420},
         {"id": 2, "name": "Gian", "score": 69},
@@ -63,12 +63,22 @@ async def leaderboard():
 
 @router.get("/greet/{name}")
 async def greet(name: str):
+    # GET /api/greet/{name}
+    # Request: path param 'name' (string)
+    # Response: a greeting string or object as produced by greet_user
     return greet_user(name)
  
 @router.get("/position/{id}")
 async def position(id: str):
+    # GET /api/position/{id}
+    # Request: path param 'id' (string)
+    # Response: position info for the id (implementation-specific)
     return find_position(id)
 
 @router.get("/remaining/{id}")
 async def rides_left(id: str):
+    # GET /api/remaining/{id}
+    # Request: path param 'id' (string)
+    # Response: remaining rides/count info for the id (implementation-specific)
     return remaining_rides(id)
+
