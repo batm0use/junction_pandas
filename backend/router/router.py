@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from backend.controller.controller import get_health, greet_user, find_position, remaining_rides
 from database.query import *
 from pydantic import BaseModel
+from backend.controller.ai import ask_ai
 
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -13,7 +14,7 @@ class Item(BaseModel):
 @router.post("/assistant")
 async def chat(message: Item):
     text = message.message
-    reply = f"I got the {text}"
+    reply = ask_ai(text)
     return {"response": reply}
 
 @router.get("/health")
