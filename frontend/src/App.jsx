@@ -4,6 +4,7 @@ import Assistant from './components/Assistant'
 import Leaderboard from './components/Leaderboard'
 import Controls from './components/Controls'
 import Notifications from './components/Notifications'
+import Carousel from './components/Carousel'
 import api from './api'
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
@@ -41,7 +42,9 @@ function getBrowserLocation(timeout = 5000){
 export default function App(){
   const [myLocation, setMyLocation] = useState(null)
   const [nearby, setNearby] = useState([])
+  const [deliveries, setDeliveries] = useState([])
   const [leaderboard, setLeaderboard] = useState([])
+  const [selectedDelivery, setSelectedDelivery] = useState(null)
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
@@ -104,6 +107,22 @@ export default function App(){
     }catch(e){
       console.warn('Refresh nearby failed', e)
       showNotification('Nearby failed', 'Could not fetch nearby places')
+    }
+  }
+
+  /**
+   * Fetch delivery options from backend for current location.
+   */
+  async function fetchDeliveries(){
+    if(!myLocation) return
+    try{
+      const list = await api.sendDeliveriesRequest(myLocation)
+      setDeliveries(Array.isArray(list) ? list : [])
+      // Show the result in the chat area as a message containing the carousel
+      showNotification('Deliveries', `Found ${list.length} delivery options`)
+    }catch(e){
+      console.warn('Fetch deliveries failed', e)
+      showNotification('Deliveries failed', 'Could not fetch deliveries')
     }
   }
 
@@ -182,17 +201,36 @@ export default function App(){
 
       <div className="topbar">
     <h1>Junction Dashboard</h1>
-  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} />
+  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} onGetDeliveries={fetchDeliveries} />
       </div>
 
       <div className="main">
-        <div className="map-area">
-          <MapView myLocation={myLocation} points={nearby} />
+          <div className="map-area">
+          <MapView myLocation={myLocation} points={nearby} selectedDelivery={selectedDelivery} />
         </div>
       </div>
 
       <div className="assistant-area">
-        <Assistant />
+        <Assistant extraContent={deliveries && deliveries.length > 0 ? (
+          <>
+            <div className="msg assistant" style={{ width: '100%' }}>
+              <div className="msg-text">
+                <Carousel items={deliveries} selectedId={selectedDelivery?.id} onSelect={(it) => setSelectedDelivery(it)} />
+              </div>
+            </div>
+
+            {selectedDelivery && (
+              <div className="msg assistant" style={{ width: '100%', marginTop: 8 }}>
+                <div className="msg-text">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedDelivery.name} — selected</div>
+                  <div>Pickup: {selectedDelivery.lat_pickup.toFixed(6)}, {selectedDelivery.lng_pickup.toFixed(6)}</div>
+                  <div>Drop: {selectedDelivery.lat_drop.toFixed(6)}, {selectedDelivery.lng_drop.toFixed(6)}</div>
+                  <div style={{ marginTop: 8, fontSize: 13, color: '#cfe9d6' }}>{selectedDelivery.extra_info}</div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : null} />
       </div>
       <Notifications items={notifications} onClose={closeNotification} />
 

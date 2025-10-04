@@ -69,8 +69,20 @@ export async function getLeaderboard() {
   return res.data;
 }
 
+/**
+ * POST /api/deliveries
+ * Request body: { lat: number, lng: number }
+ * Response: Array of delivery objects with fields:
+ *   { id, name, eta_food, eta_arrive, lat_pickup, lng_pickup, lat_drop, lng_drop, extra_info }
+ */
+export async function sendDeliveriesRequest(location){
+  const res = await axios.post(`${API_BASE}/deliveries`, location)
+  return res.data
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
   getLeaderboard,
+  sendDeliveriesRequest,
 };

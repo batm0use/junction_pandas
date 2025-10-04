@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import api, {playTTS} from '../api'
+import PropTypes from 'prop-types'
 
 /**
  * Assistant chat component.
  * Handles composing messages, sending them to the assistant API, and rendering replies.
  * @returns {JSX.Element}
  */
-export default function Assistant(){
+export default function Assistant({ extraContent }){
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -20,7 +21,6 @@ export default function Assistant(){
     if (role === "assistant")
       playTTS(text).then();
   }
-
   // scroll to bottom when messages update
   useEffect(() => {
     const last = lastRef.current
@@ -71,6 +71,9 @@ export default function Assistant(){
             <div className="msg-text">{m.text}</div>
           </div>
         ))}
+
+        {/* Render any externally injected content (e.g., carousel) as part of the chat */}
+        {extraContent}
       </div>
 
       <div className="compose">
@@ -88,4 +91,12 @@ export default function Assistant(){
     </div>
   )
 
+}
+
+Assistant.propTypes = {
+  extraContent: PropTypes.node,
+}
+
+Assistant.defaultProps = {
+  extraContent: null,
 }
