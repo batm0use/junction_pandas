@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.router.router import router
+from router import *
 
 app = FastAPI(title="Backend API")
 
@@ -14,7 +14,7 @@ def run(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
       run()
     """
     import uvicorn
-    uvicorn.run("backend.app:app", host=host, port=port, reload=reload)
+    uvicorn.run("app:app", host=host, port=port, reload=reload)
 
 
 if __name__ == "__main__":
