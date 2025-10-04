@@ -16,16 +16,14 @@ def nearby_locations(lat: float, lng: float, count: int = 3):
     This is intentionally simple and deterministic for testing.
     """
     list_merchants = nearest_merchants(lat, lng)
-    # (id, float)
+    # [id, dist, lat, long] 
 
-    # create small offsets (roughly ~100m per 0.001 degree) around the point
-    offsets = [(-0.001, -0.001), (0.0, 0.001), (0.001, 0.0)]
     results = []
-    for i, (dy, dx) in enumerate(offsets[:count], start=1):
+    for i, x in enumerate(list_merchants):
         results.append({
-            "id": i,
-            "lat": round(lat + dy, 7),
-            "lng": round(lng + dx, 7),
+            "id": x[0],
+            "lat": round(x[2], 7),
+            "lng": round(x[3], 7),
             "name": f"Nearby {i}"
         })
     return results
