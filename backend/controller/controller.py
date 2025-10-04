@@ -2,7 +2,7 @@ from database.query import position_by_id, what_you_need, top_drivers, calculate
 from database.distances_calculation import nearest_merchants
 from typing import Dict
 
-PERCENTAGE = 0.25
+PERCENTAGE = 0.05
 
 def find_position(id: str) -> Dict[str, int]:
     return {"position" : position_by_id(id)}
