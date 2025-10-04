@@ -44,5 +44,18 @@ def estimate_eta(lat1, lon1, lat2, lon2, avg_speed_kmh, traffic_bias):
         "eta_minutes": round(time_hours * 60, 1)
     }
 
+def make_it_home(lat1, lon1, lat2, lon2, lat3, lon3, avg_speed_kmh, traffic_bias, available_time):
+    loc_dest= estimate_eta(lat1, lon1, lat2, lon2, avg_speed_kmh, traffic_bias)
+    dest_home= estimate_eta(lat2, lon2, lat3, lon3, avg_speed_kmh, traffic_bias)
+
+    return loc_dest + dest_home <= available_time
+
+def close_to_home(lat1, lon1, lat2, lon2):
+    distance= haversine(lat1, lon1, lat2, lon2)
+    return distance <= 5
+
+    cursor = get_id()
+    cursor.execute(query)
+
 
 print(nearest_merchants(52.07, 4.4))
