@@ -45,54 +45,52 @@ export default function App(){
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
-  const [summary, setSummary] = useState({ remaining: 0, percentile: 0 })
+  const [summary, setSummary] = useState([])
 
-  useEffect(() => {
-    let mounted = true
+useEffect(() => {
+  let mounted = true
 
-    async function determineInitialLocation(){
-          // Prefer browser-provided location, otherwise use default.
-          try{
-            const location = await getBrowserLocation(5000)
-            return location
-          }catch(err){
-            console.warn('Browser geolocation failed — using default location', err)
-          }
-          return DEFAULT_LOCATION
+  async function determineInitialLocation() {
+    try {
+      const location = await getBrowserLocation(5000)
+      return location
+    } catch (err) {
+      console.warn('Browser geolocation failed — using default location', err)
+    }
+    return DEFAULT_LOCATION
+  }
 
-    async function fetchSummary() {
+  async function fetchSummary() {
     try {
       const userId = 'E10000' // Replace with actual logic
       const data = await api.getLeaderboardSummary(userId)
-      setSummary(data)
+      if (mounted) setSummary(data)
     } catch (e) {
       console.error('Failed to fetch leaderboard summary', e)
     }
   }
 
-  fetchSummary()
+  async function init() {
+    try {
+      const location = await determineInitialLocation()
+      await fetchSummary()
+      if (!mounted) return
+      setMyLocation(location)
+
+      const lb = await api.getLeaderboard()
+      if (mounted) setLeaderboard(Array.isArray(lb) ? lb : [])
+    } catch (e) {
+      console.error('Failed to initialize app data', e)
+      if (mounted) setMyLocation(DEFAULT_LOCATION)
     }
+  }
 
-    async function init(){
-      try{
-        const location = await determineInitialLocation()
-        await fetchSummary()
-        if(!mounted) return
-        setMyLocation(location)
+  init()
 
-        // Do NOT fetch nearby places automatically — wait for user to click Refresh Nearby
-
-        const lb = await api.getLeaderboard()
-        if(mounted) setLeaderboard(Array.isArray(lb) ? lb : [])
-      }catch(e){
-        console.error('Failed to initialize app data', e)
-        if(mounted) setMyLocation(DEFAULT_LOCATION)
-      }
-    }
-
-    init()
-    return () => { mounted = false }
-  }, [])
+  return () => {
+    mounted = false
+  }
+}, [])
 
   // Auto-trigger break confirmation every BREAK_INTERVAL_MS
   useEffect(() => {
