@@ -17,3 +17,20 @@ def find_position(id: str) -> Dict[str, int]:
 
 def remaining_rides(id: str) -> Dict[str, int]:
     return {"remaining" : what_you_need(id, PERCENTAGE)}
+
+
+def nearby_locations(lat: float, lng: float, count: int = 3):
+    """Return a small list of demo nearby points around the provided lat/lng.
+    This is intentionally simple and deterministic for testing.
+    """
+    # create small offsets (roughly ~100m per 0.001 degree) around the point
+    offsets = [(-0.001, -0.001), (0.0, 0.001), (0.001, 0.0)]
+    results = []
+    for i, (dy, dx) in enumerate(offsets[:count], start=1):
+        results.append({
+            "id": i,
+            "lat": round(lat + dy, 7),
+            "lng": round(lng + dx, 7),
+            "name": f"Nearby {i}"
+        })
+    return results
