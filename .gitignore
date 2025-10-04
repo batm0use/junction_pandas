@@ -1,24 +1,48 @@
-# Dependencies
+# ----------------
+# System / editors
+# ----------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --------------
+# Python artifacts
+# --------------
+_pycache_/
+*.py[cod]
+*.pyo
+*.pyd
+*.python-version
+.env          
+venv/
+.venv/
+env/
+ENV/
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+htmlcov/
+.coverage
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+
+# --------------
+# Node / frontend
+# --------------
 node_modules/
-/.pnp
-.pnp.js
-
-
-# Misc
-.DS_Store
-.env
-__pycache__
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-frontend/node_modules
-frontend/dist
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/frontend/dist/
+/frontend/node_modules/
+# --------------
+# OS / misc
+# --------------
+*.log
+logs/
+*.bak
+*.tmp
