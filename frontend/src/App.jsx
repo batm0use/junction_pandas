@@ -4,10 +4,13 @@ import Assistant from './components/Assistant'
 import Leaderboard from './components/Leaderboard'
 import Controls from './components/Controls'
 import Notifications from './components/Notifications'
-import api from './api'
+
+import Carousel from './components/Carousel'
+import api, {playTTS} from './api'
+
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
-
+const BREAK_MESSAGE = "Hey, we noticed you have been working hard! Would you like to take a short break?"
 // Configurable timings (change these values as needed)
 const NOTIFICATION_WAIT_MS = 6000 // default notification auto-dismiss in milliseconds (6s)
 const BREAK_INTERVAL_MS = 5 * 60 * 1000 // auto-trigger break every 5 minutes
@@ -41,7 +44,9 @@ function getBrowserLocation(timeout = 5000){
 export default function App(){
   const [myLocation, setMyLocation] = useState(null)
   const [nearby, setNearby] = useState([])
+  const [deliveries, setDeliveries] = useState([])
   const [leaderboard, setLeaderboard] = useState([])
+  const [selectedDelivery, setSelectedDelivery] = useState(null)
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
@@ -122,6 +127,22 @@ export default function App(){
   }
 
   /**
+   * Fetch delivery options from backend for current location.
+   */
+  async function fetchDeliveries(){
+    if(!myLocation) return
+    try{
+      const list = await api.sendDeliveriesRequest(myLocation)
+      setDeliveries(Array.isArray(list) ? list : [])
+      // Show the result in the chat area as a message containing the carousel
+      showNotification('Deliveries', `Found ${list.length} delivery options`)
+    }catch(e){
+      console.warn('Fetch deliveries failed', e)
+      showNotification('Deliveries failed', 'Could not fetch deliveries')
+    }
+  }
+
+  /**
    * Re-run browser geolocation to refresh `myLocation` and show a notification.
    * @returns {Promise<void>}
    */
@@ -141,7 +162,8 @@ export default function App(){
    * If the user confirms, it triggers refreshNearby().
    */
   function triggerBreak(){
-    setConfirmOpen(true)
+    setConfirmOpen(true);
+    playTTS(BREAK_MESSAGE).then();
   }
 
   /**
@@ -196,27 +218,46 @@ export default function App(){
 
       <div className="topbar">
     <h1>Junction Dashboard</h1>
-  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} />
+  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} onGetDeliveries={fetchDeliveries} />
       </div>
 
       <div className="main">
-        <div className="map-area">
-          <MapView myLocation={myLocation} points={nearby} />
+          <div className="map-area">
+          <MapView myLocation={myLocation} points={nearby} selectedDelivery={selectedDelivery} />
         </div>
       </div>
 
       <div className="assistant-area">
-        <Assistant />
+        <Assistant extraContent={deliveries && deliveries.length > 0 ? (
+          <>
+            <div className="msg assistant" style={{ width: '100%' }}>
+              <div className="msg-text">
+                <Carousel items={deliveries} selectedId={selectedDelivery?.id} onSelect={(it) => setSelectedDelivery(it)} />
+              </div>
+            </div>
+
+            {selectedDelivery && (
+              <div className="msg assistant" style={{ width: '100%', marginTop: 8 }}>
+                <div className="msg-text">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedDelivery.name} — selected</div>
+                  <div>Pickup: {selectedDelivery.lat_pickup.toFixed(6)}, {selectedDelivery.lng_pickup.toFixed(6)}</div>
+                  <div>Drop: {selectedDelivery.lat_drop.toFixed(6)}, {selectedDelivery.lng_drop.toFixed(6)}</div>
+                  <div style={{ marginTop: 8, fontSize: 13, color: '#cfe9d6' }}>{selectedDelivery.extra_info}</div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : null} />
       </div>
       <Notifications items={notifications} onClose={closeNotification} />
 
       {confirmOpen && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
-            <div className="confirm-title">You want to take a break?</div>
+            <div className="confirm-title">{BREAK_MESSAGE}</div>
             <div className="confirm-actions">
-              <button className="btn" onClick={() => handleConfirm(false)}>No</button>
               <button className="btn" onClick={() => handleConfirm(true)}>Yes</button>
+              <button className="btn" onClick={() => handleConfirm(false)}>No</button>
             </div>
           </div>
         </div>
