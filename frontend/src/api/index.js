@@ -14,6 +14,26 @@ export async function sendMessageToAssistant(message) {
   return res.data;
 }
 
+/**
+ * Send a message to the assistant backend endpoint.
+ * POST /api/assistant
+ * @param {string} message - user message text to send
+ * @returns {Promise<any>} - backend response body (often { response: string } or plain string)
+ */
+export async function playTTS(message) {
+    const res = await fetch(`${API_BASE}/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ "message": message }),
+    });
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.volume = 1;
+    return audio.play();
+  }
+
 
 // Send current location to backend and receive nearby places
 // Request: { lat: number, lng: number }
@@ -54,8 +74,38 @@ export async function getLeaderboardSummary(userId) {
   return await response.json()
 }
 
+/**
+ * Play text-to-speech via backend TTS endpoint. Returns a Promise that resolves when playback starts.
+ * @param {string} message
+ */
+export async function playTTS(message) {
+  const res = await fetch(`${API_BASE}/tts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  })
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const audio = new Audio(url)
+  audio.volume = 1
+  return audio.play()
+}
+
+/**
+ * POST /api/deliveries
+ * Request body: { lat: number, lng: number }
+ * Response: Array of delivery objects with fields:
+ *   { id, name, eta_food, eta_arrive, lat_pickup, lng_pickup, lat_drop, lng_drop, extra_info }
+ */
+export async function sendDeliveriesRequest(location){
+  const res = await axios.post(`${API_BASE}/deliveries`, location)
+  return res.data
+
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
   getLeaderboard,
+  sendDeliveriesRequest,
 };
