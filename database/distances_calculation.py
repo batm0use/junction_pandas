@@ -33,7 +33,16 @@ def nearest_merchants(lat1,lon1):
         merchants.append([merchant, distance])
 
     merchants = sorted(merchants, key = lambda x: x[1])
-    res= list(filter(lambda x: x[1]<10, merchants))
+    res= list(filter(lambda x: x[1]<=10, merchants))
     return res
+
+def estimate_eta(lat1, lon1, lat2, lon2, avg_speed_kmh, traffic_bias):
+    distance_km = haversine(lat1, lon1, lat2, lon2)
+    time_hours = traffic_bias* distance_km / avg_speed_kmh
+    return {
+        "distance_km": round(distance_km, 2),
+        "eta_minutes": round(time_hours * 60, 1)
+    }
+
 
 print(nearest_merchants(52.07, 4.4))
