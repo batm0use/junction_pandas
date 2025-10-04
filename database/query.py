@@ -54,12 +54,23 @@ def what_you_need(driver_id, percentage):
 
     return goal-current_drives
 
+def top_drivers():
+    # conn = sqlite3.connect('uber.db')
+    # cursor = conn.cursor()
+    cursor = get_id()
+    _query = f"SELECT COUNT(ride_id) FROM rides_trips GROUP BY driver_id"
+    cursor.execute(_query)
+    res = cursor.fetchall()
+    values = [row[0] for row in res]
+
+    return values[:5]
 
 #print(drives_per_one_driver("E10000777"))
 #print(count_drivers())
 #print(cutoff(0.25))
 #print(position_by_id("E10000"))
 #rows = cursor.fetchall()
+print(top_drivers())
 
 #for row in rows:
 #    print(row)

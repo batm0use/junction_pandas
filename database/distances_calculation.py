@@ -16,9 +16,9 @@ def haversine(lat1, lon1, lat2, lon2):
 
 query = ("SELECT merchant_id, lat, lon  FROM merchants")
 def nearest_merchants(lat1,lon1):
-    conn = sqlite3.connect('uber.db')
-    cursor = conn.cursor()
-#    cursor = get_id()
+    # conn = sqlite3.connect('uber.db')
+    # cursor = conn.cursor()
+    cursor = get_id()
     cursor.execute(query)
     rows = cursor.fetchall()
 
