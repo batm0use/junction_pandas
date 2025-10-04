@@ -3,9 +3,6 @@ import sqlite3
 from numpy import mean
 from database.initializer import get_id
 
-conn = sqlite3.connect("uber.db")
-cursor = conn.cursor()
-
 MERCHANT = "M107"
 velocities ={
     "car":[25, 35],
@@ -27,6 +24,7 @@ query = ("SELECT vehicle_type, distance_km, duration_mins FROM eats_orders WHERE
 
 def get_eta_for_food_by_merchant(merchant):
     cursor = get_id()
+
     cursor.execute(query, (merchant,))
     rows = cursor.fetchall()
     #print(rows, "\n")

@@ -17,7 +17,7 @@ __pycache__/
 # --------------
 # Python artifacts
 # --------------
-_pycache_/
+pycache/
 *.py[cod]
 *.pyo
 *.pyd
