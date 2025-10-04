@@ -1,5 +1,7 @@
 from fastapi import APIRouter
-from backend.controller.controller import get_health, greet_user
+from controller.controller import get_health, greet_user
+# TODO: import frontend here
+
 
 router = APIRouter(prefix="/api", tags=["api"])
 
