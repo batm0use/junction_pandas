@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
+from backend.controller.ai import ask_ai
 
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -18,7 +19,7 @@ async def chat(message: Item):
     # Example request: { "message": "Hello" }
     # Example response: { "response": "I got the Hello" }
     text = message.message
-    reply = f"I got the {text}"
+    reply = ask_ai(text)
     return {"response": reply}
 
 
