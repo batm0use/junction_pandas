@@ -4,10 +4,10 @@ import Assistant from './components/Assistant'
 import Leaderboard from './components/Leaderboard'
 import Controls from './components/Controls'
 import Notifications from './components/Notifications'
-import api from './api'
+import api, {playTTS} from './api'
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
-
+const BREAK_MESSAGE = "Hey, we noticed you have been working hard! Would you like to take a short break?"
 // Configurable timings (change these values as needed)
 const NOTIFICATION_WAIT_MS = 6000 // default notification auto-dismiss in milliseconds (6s)
 const BREAK_INTERVAL_MS = 5 * 60 * 1000 // auto-trigger break every 5 minutes
@@ -127,7 +127,8 @@ export default function App(){
    * If the user confirms, it triggers refreshNearby().
    */
   function triggerBreak(){
-    setConfirmOpen(true)
+    setConfirmOpen(true);
+    playTTS(BREAK_MESSAGE).then();
   }
 
   /**
@@ -199,10 +200,10 @@ export default function App(){
       {confirmOpen && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
-            <div className="confirm-title">You want to take a break?</div>
+            <div className="confirm-title">{BREAK_MESSAGE}</div>
             <div className="confirm-actions">
-              <button className="btn" onClick={() => handleConfirm(false)}>No</button>
               <button className="btn" onClick={() => handleConfirm(true)}>Yes</button>
+              <button className="btn" onClick={() => handleConfirm(false)}>No</button>
             </div>
           </div>
         </div>
