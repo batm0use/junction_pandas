@@ -21,4 +21,5 @@ __pycache__
 *.sw?
 
 fronend/node_modules
+fronend/dist
 fronend
