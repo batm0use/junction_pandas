@@ -1,13 +1,8 @@
 import React from 'react'
-
-const sample = [
-  { id: 1, name: 'Alice', score: 120 },
-  { id: 2, name: 'Bob', score: 100 },
-  { id: 3, name: 'Carol', score: 90 },
-]
+import PropTypes from 'prop-types'
 
 export default function Leaderboard({ items }){
-  const list = Array.isArray(items) && items.length ? items : sample
+  const list = Array.isArray(items) ? items : []
   return (
     <div className="leaderboard">
       {list.map(p => (
@@ -19,4 +14,9 @@ export default function Leaderboard({ items }){
     </div>
   )
 }
+
+Leaderboard.propTypes = {
+  items: PropTypes.array,
+}
+
 

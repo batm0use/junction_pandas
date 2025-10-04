@@ -7,6 +7,36 @@ import api from './api'
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
 
+// Try to get location from browser geolocation (promise)
+function getBrowserLocation(timeout = 5000){
+  if (!navigator?.geolocation) return Promise.reject(new Error('Geolocation not available'))
+
+  return new Promise((resolve, reject) => {
+    const onSuccess = (pos) => {
+      clearTimeout(timer)
+      resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+    }
+
+    const onError = (err) => {
+      clearTimeout(timer)
+      reject(err)
+    }
+
+    const timer = setTimeout(() => onError(new Error('Geolocation timeout')), timeout)
+    navigator.geolocation.getCurrentPosition(onSuccess, onError, { enableHighAccuracy: true, maximumAge: 10000, timeout })
+  })
+}
+
+async function fetchBackendLocation(){
+  try{
+    const loc = await api.getMyLocation()
+    if (loc?.lat && loc?.lng) return { lat: loc.lat, lng: loc.lng }
+  }catch(e){
+    console.warn('Backend my_location failed', e)
+  }
+  return null
+}
+
 export default function App(){
   const [myLocation, setMyLocation] = useState(null)
   const [nearby, setNearby] = useState([])
@@ -15,15 +45,48 @@ export default function App(){
 
   useEffect(() => {
     let mounted = true
+
+    async function determineInitialLocation(){
+      // Prefer browser-provided location, then backend, then default
+      try{
+        const location = await getBrowserLocation(5000)
+        return location
+      }catch(err){
+        console.warn('Browser geolocation failed, falling back to backend', err)
+        try{
+          const loc = await api.getMyLocation()
+          if (loc?.lat && loc?.lng) return { lat: loc.lat, lng: loc.lng }
+        }catch(apiErr){
+          console.warn('Backend my_location failed', apiErr)
+        }
+      }
+      return DEFAULT_LOCATION
+    }
+
+    async function fetchNearbyForLocation(location){
+      try{
+        const places = await api.sendNearbyPlacesRequest(location)
+        return Array.isArray(places) ? places : []
+      }catch(e){
+        console.warn('Failed to fetch nearby places with POST, falling back to GET', e)
+        try{
+          const places = await api.getNearbyPlaces()
+          return Array.isArray(places) ? places : []
+        }catch(inner){
+          console.warn('Fallback GET nearby failed', inner)
+          return []
+        }
+      }
+    }
+
     async function init(){
       try{
-        const loc = await api.getMyLocation()
-        const location = loc?.lat && loc?.lng ? { lat: loc.lat, lng: loc.lng } : DEFAULT_LOCATION
+        const location = await determineInitialLocation()
         if(!mounted) return
         setMyLocation(location)
 
-        const places = await api.getNearbyPlaces()
-        if(mounted) setNearby(Array.isArray(places) ? places.map(p => ({ id: p.id, lat: p.lat ?? p.y ?? p[1], lng: p.lng ?? p.x ?? p[0], name: p.name })) : [])
+        const places = await fetchNearbyForLocation(location)
+        if(mounted) setNearby(places.map(p => ({ id: p.id, lat: p.lat ?? p.y ?? p[1], lng: p.lng ?? p.x ?? p[0], name: p.name })))
 
         const lb = await api.getLeaderboard()
         if(mounted) setLeaderboard(Array.isArray(lb) ? lb : [])
@@ -32,9 +95,21 @@ export default function App(){
         if(mounted) setMyLocation(DEFAULT_LOCATION)
       }
     }
+
     init()
     return () => { mounted = false }
   }, [])
+
+  // refresh handler to request nearby places again using current myLocation
+  async function refreshNearby(){
+    if(!myLocation) return
+    try{
+      const places = await api.sendNearbyPlacesRequest(myLocation)
+      setNearby(Array.isArray(places) ? places.map(p => ({ id: p.id, lat: p.lat ?? p.y ?? p[1], lng: p.lng ?? p.x ?? p[0], name: p.name })) : [])
+    }catch(e){
+      console.warn('Refresh nearby failed', e)
+    }
+  }
 
   return (
     <div className="app-root dark">
@@ -45,7 +120,7 @@ export default function App(){
 
       <div className="topbar">
         <h1>Junction Dashboard</h1>
-        <Controls setMyLocation={setMyLocation} />
+  <Controls setMyLocation={setMyLocation} onRefreshNearby={refreshNearby} />
       </div>
 
       <div className="main">

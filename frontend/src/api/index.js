@@ -61,12 +61,17 @@ export async function getMyLocation() {
 }
 
 export async function getNearbyPlaces() {
-  // Response expected: array of places. Supported shapes:
-  //  - { id, lat, lng, name }
-  //  - { id, x, y, name }  (frontend will map x->lng and y->lat)
-  // Example: [ { id: 1, lat: 51.9991, lng: 4.3620, name: 'Cafe' } ]
+  // Deprecated: use sendNearbyPlacesRequest with a location payload.
   const res = await axios.get(`${API_BASE}/nearby_places`);
   return res.data;
+}
+
+// Send current location to backend and receive nearby places
+// Request: { lat: number, lng: number }
+// Response: [{ id, lat, lng, name }, ...]
+export async function sendNearbyPlacesRequest(location){
+  const res = await axios.post(`${API_BASE}/nearby_places`, location)
+  return res.data
 }
 
 export async function getLeaderboard() {
@@ -80,4 +85,6 @@ export default {
   sendMessageToAssistant,
   getMyLocation,
   getNearbyPlaces,
+  sendNearbyPlacesRequest,
+  getLeaderboard,
 };

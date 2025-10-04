@@ -24,11 +24,7 @@ FlyToLocation.propTypes = {
 export default function MapView({ myLocation, points }){
   const center = myLocation ? [myLocation.lat, myLocation.lng] : DELFT_CENTER
 
-  const renderPoints = (points && points.length) ? points : [
-    { id: 'delft-1', name: 'Delft Center', lat: 51.9995, lng: 4.3625 },
-    { id: 'delft-2', name: 'Nearby A', lat: 51.9991, lng: 4.3620 },
-    { id: 'delft-3', name: 'Nearby B', lat: 51.9999, lng: 4.3629 },
-  ]
+  const renderPoints = points?.length ? points : []
 
   return (
     <div className="map-wrapper">
