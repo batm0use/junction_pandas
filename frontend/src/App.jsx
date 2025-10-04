@@ -8,6 +8,10 @@ import api from './api'
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
 
+// Configurable timings (change these values as needed)
+const NOTIFICATION_WAIT_MS = 6000 // default notification auto-dismiss in milliseconds (6s)
+const BREAK_INTERVAL_MS = 5 * 60 * 1000 // auto-trigger break every 5 minutes
+
 /**
  * Try to get the user's current location from the browser Geolocation API.
  * Returns a Promise that resolves with an object { lat, lng } on success.
@@ -76,6 +80,15 @@ export default function App(){
     return () => { mounted = false }
   }, [])
 
+  // Auto-trigger break confirmation every BREAK_INTERVAL_MS
+  useEffect(() => {
+    const id = setInterval(() => {
+      // open confirmation modal periodically
+      setConfirmOpen(true)
+    }, BREAK_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [])
+
   /**
    * Fetch nearby places for the current `myLocation` by POSTing to the backend.
    * On success updates `nearby` state and shows a notification.
@@ -136,6 +149,10 @@ export default function App(){
   function pushNotification(item){
     const id = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
     setNotifications(prev => [...prev, { id, ...item }])
+    // schedule auto-dismiss
+    setTimeout(() => {
+      closeNotification(id)
+    }, NOTIFICATION_WAIT_MS)
     return id
   }
 
