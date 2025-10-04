@@ -2,22 +2,26 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 /**
- * Simple leaderboard display component.
+ * Leaderboard summary component.
  * @param {{items: Array<{id:number,name:string,score:number}>}} props
  * @returns {JSX.Element}
  */
-export default function Leaderboard({ items }){
-  const list = Array.isArray(items) ? items : []
+export default function Leaderboard({ summary }) {
+  const { remaining, percentile } = summary ?? {}
+
   return (
-    <div className="leaderboard">
-      {list.map(p => (
-        <div key={p.id} className="player">
-          <div className="name">{p.name}</div>
-          <div className="score">{p.score ?? p.points ?? ''}</div>
-        </div>
-      ))}
+    <div className="leaderboard-summary">
+      <p>You are better than <strong>{percentile}%</strong> of users.</p>
+      <p>You have <strong>{remaining}</strong> trips remaining to get a bonus.</p>
     </div>
   )
+}
+
+Leaderboard.propTypes = {
+  summary: PropTypes.shape({
+    remaining: PropTypes.number,
+    percentile: PropTypes.number,
+  }),
 }
 
 Leaderboard.propTypes = {

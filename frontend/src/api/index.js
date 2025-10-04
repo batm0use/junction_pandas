@@ -68,6 +68,11 @@ export async function getLeaderboard() {
   const res = await axios.get(`${API_BASE}/leaderboard`);
   return res.data;
 }
+export async function getLeaderboardSummary(userId) {
+  const response = await fetch(`${API_BASE}/leaderboard-summary/${userId}`)
+  if (!response.ok) throw new Error('Failed to fetch leaderboard summary')
+  return await response.json()
+}
 
 /**
  * POST /api/deliveries
