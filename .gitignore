@@ -6,6 +6,13 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+__pycache__/
+backend/__pycache__/
+backend/controller/__pycache__/
+backend/router/__pycache__/
+database/__pycache__/
+__pycache__/
+*.py[cod]
 
 # --------------
 # Python artifacts
