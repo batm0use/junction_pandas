@@ -11,5 +11,5 @@ def ask_ai(msg : str):
     for x in response.text.splitlines():
         ret += json.loads(x)["message"]["content"]
         # ret += json.loads(x).message.content
-    return ret
+    return ret.strip()
 
