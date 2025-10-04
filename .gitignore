@@ -6,11 +6,18 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+_pycache_/
+backend/_pycache_/
+backend/controller/_pycache_/
+backend/router/_pycache_/
+database/_pycache_/
+_pycache_/
+*.py[cod]
 
 # --------------
 # Python artifacts
 # --------------
-_pycache_/
+pycache/
 *.py[cod]
 *.pyo
 *.pyd
@@ -37,8 +44,9 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/frontend/dist/
-/frontend/node_modules/
+frontend/dist/
+frontend/node_modules/
+frontend/package-lock.json
 # --------------
 # OS / misc
 # --------------
