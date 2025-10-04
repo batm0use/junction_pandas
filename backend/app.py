@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.router import *
+from backend.router.router import router
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -8,7 +8,7 @@ from fastapi import Request
 app = FastAPI(title="Backend API")
 
 # Mount the frontend build (Vite -> dist) at root if present. This lets the SPA handle client-side routes.
-FRONTEND_DIST = Path(__file__).resolve().parent / "frontend" / "dist"
+FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 # Include API routes first so they take precedence over static files mounted at '/'
 app.include_router(router)
@@ -33,6 +33,6 @@ def run(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
       run()
     """
     import uvicorn
-    uvicorn.run("app:app", host=host, port=port, reload=reload)
+    uvicorn.run("backend.app:app", host=host, port=port, reload=reload)
 
 

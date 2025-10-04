@@ -20,6 +20,5 @@ __pycache__
 *.sln
 *.sw?
 
-fronend/node_modules
-fronend/dist
-fronend
+frontend/node_modules
+frontend/dist
