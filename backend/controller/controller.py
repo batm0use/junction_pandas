@@ -1,4 +1,4 @@
-from database.query import position_by_id, what_you_need, top_drivers
+from database.query import position_by_id, what_you_need, top_drivers, calculate_percentile
 from database.distances_calculation import nearest_merchants
 from typing import Dict
 
@@ -10,6 +10,14 @@ def find_position(id: str) -> Dict[str, int]:
 def remaining_rides(id: str) -> Dict[str, int]:
     return {"remaining" : what_you_need(id, PERCENTAGE)}
 
+def get_percentage(id: str) -> Dict[str, int]:
+    return {"percentile" : calculate_percentile(id)}
+
+def get_leaderboard_summary(id: str) -> Dict[str, int]:
+    return {
+        "remaining": what_you_need(id, PERCENTAGE),
+        "percentile": calculate_percentile(id)
+    }
 
 def nearby_locations(lat: float, lng: float, count: int = 3):
     """Return a small list of demo nearby points around the provided lat/lng.

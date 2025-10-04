@@ -45,6 +45,7 @@ export default function App(){
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
+  const [summary, setSummary] = useState({ remaining: 0, percentile: 0 })
 
   useEffect(() => {
     let mounted = true
@@ -58,11 +59,24 @@ export default function App(){
             console.warn('Browser geolocation failed — using default location', err)
           }
           return DEFAULT_LOCATION
+
+    async function fetchSummary() {
+    try {
+      const userId = 'E10000' // Replace with actual logic
+      const data = await api.getLeaderboardSummary(userId)
+      setSummary(data)
+    } catch (e) {
+      console.error('Failed to fetch leaderboard summary', e)
+    }
+  }
+
+  fetchSummary()
     }
 
     async function init(){
       try{
         const location = await determineInitialLocation()
+        await fetchSummary()
         if(!mounted) return
         setMyLocation(location)
 
@@ -176,8 +190,8 @@ export default function App(){
   return (
     <div className="app-root dark">
       <aside className="sidebar">
-        <h2>Leaderboard</h2>
-        <Leaderboard items={leaderboard} />
+        <h2>Your Progress</h2>
+        <Leaderboard summary={summary} />
       </aside>
 
       <div className="topbar">

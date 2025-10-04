@@ -47,6 +47,14 @@ def position_by_id(driver_id):
 
     return len(res)+1
 
+def calculate_percentile(driver_id):
+    cursor = get_id()
+    pos= position_by_id(driver_id)
+    total= count_drivers()
+    percentage= (1- ((pos-1)/total))*100
+    return percentage
+
+
 def what_you_need(driver_id, percentage):
     cursor = get_id()
     current_drives= drives_per_one_driver(driver_id)

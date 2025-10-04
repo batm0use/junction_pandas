@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores
+from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
+    get_percentage
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
@@ -21,6 +22,15 @@ async def chat(message: Item):
     text = message.message
     reply = ask_ai(text)
     return {"response": reply}
+
+from backend.controller.controller import get_leaderboard_summary
+
+@router.get("/leaderboard-summary/{id}")
+async def leaderboard_summary(id: str):
+    # GET /api/leaderboard-summary/{id}
+    # Request: path param 'id' (string)
+    # Response: { "remaining": int, "percentile": int }
+    return get_leaderboard_summary(id)
 
 
 class LocationPayload(BaseModel):
@@ -66,10 +76,19 @@ async def position(id: str):
     # Response: position info for the id (implementation-specific)
     return find_position(id)
 
+@router.get("/percentile/{id}")
+async def percentile(id: str):
+    # GET /api/position/{id}
+    # Request: path param 'id' (string)
+    # Response: position info for the id (implementation-specific)
+    return get_percentage(id)
+
 @router.get("/remaining/{id}")
 async def rides_left(id: str):
     # GET /api/remaining/{id}
     # Request: path param 'id' (string)
     # Response: remaining rides/count info for the id (implementation-specific)
     return remaining_rides(id)
+
+
 
