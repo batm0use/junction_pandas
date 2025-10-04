@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.controller.controller import get_health, greet_user, find_position, remaining_rides, nearby_locations
+from backend.controller.controller import find_position, remaining_rides, nearby_locations
 from database.query import *
 from pydantic import BaseModel
 
@@ -20,13 +20,6 @@ async def chat(message: Item):
     text = message.message
     reply = f"I got the {text}"
     return {"response": reply}
-
-@router.get("/health")
-async def health():
-    # GET /api/health
-    # Request: none
-    # Response: server health/status object. Example: { "status": "ok" }
-    return get_health()
 
 
 class LocationPayload(BaseModel):
@@ -61,13 +54,6 @@ async def leaderboard():
     ]
 
 
-@router.get("/greet/{name}")
-async def greet(name: str):
-    # GET /api/greet/{name}
-    # Request: path param 'name' (string)
-    # Response: a greeting string or object as produced by greet_user
-    return greet_user(name)
- 
 @router.get("/position/{id}")
 async def position(id: str):
     # GET /api/position/{id}

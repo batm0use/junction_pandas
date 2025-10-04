@@ -1,52 +1,7 @@
 import axios from "axios";
 
-/*
-  Frontend API helper
-
-  API_BASE: set via Vite env `VITE_API_BASE` or defaults to http://localhost:8000/api
-
-  Endpoints used by the frontend (expected shapes):
-
-
-  POST /api/assistant
-    - Request body: { message: string }
-    - Response: { response: string }  OR a plain string
-
-  GET /api/my_location
-    - Request: none
-    - Response (expected): { lat: number, lng: number }
-      Example: { "lat": 51.9995, "lng": 4.3625 }
-    - If server cannot provide location, it may return null or 204/empty.
-
-  GET /api/nearby_places
-    - Request: none (later we may include query params)
-    - Response (expected): Array of places. Each place should contain coordinates and a name.
-      Flexible shapes supported by the frontend mapper:
-        - { id, lat, lng, name }
-        - { id, x, y, name }  (x -> lng, y -> lat)
-        - [lng, lat] tuple inside an object (less common)
-      Example: [ { "id": 1, "lat": 51.9991, "lng": 4.3620, "name": "Cafe" } ]
-
-  GET /api/leaderboard
-    - Request: none
-    - Response (expected): Array of leaderboard items:
-      [ { id, name, score } ]
-
-  Notes: The helpers below accept a few flexible shapes and normalize them where appropriate.
-*/
-
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
 
-/**
- * GET /api/health
- * Request: none
- * Response: object - health/status info from the server. Example: { status: 'ok' }
- * Notes: lightweight health check used by the frontend to verify the backend is reachable.
- */
-export async function getHealth() {
-  const res = await axios.get(`${API_BASE}/health`);
-  return res.data;
-}
 
 /**
  * POST /api/assistant
@@ -63,34 +18,6 @@ export async function sendMessageToAssistant(message) {
   return res.data;
 }
 
-// New API placeholders
-/**
- * GET /api/my_location
- * Request: none
- * Response (frontend expectation):
- *   - { lat: number, lng: number }
- *   - Example: { "lat": 51.9995, "lng": 4.3625 }
- *   - May also return null/empty if server cannot determine a location
- */
-export async function getMyLocation() {
-  const res = await axios.get(`${API_BASE}/my_location`);
-  return res.data;
-}
-
-/**
- * GET /api/nearby_places  (deprecated for the primary workflow)
- * Request: none
- * Response (frontend expectation): Array of place objects in flexible shapes. Examples supported:
- *   - { id, lat, lng, name }
- *   - { id, x, y, name }   (x -> lng, y -> lat)
- *   - Minimal coordinate tuple inside object (uncommon)
- * Example response: [{ "id": 1, "lat": 51.9991, "lng": 4.3620, "name": "Cafe" }]
- * Notes: prefer POST /api/nearby_places with client's location for more accurate results.
- */
-export async function getNearbyPlaces() {
-  const res = await axios.get(`${API_BASE}/nearby_places`);
-  return res.data;
-}
 
 // Send current location to backend and receive nearby places
 // Request: { lat: number, lng: number }
@@ -111,6 +38,28 @@ export async function sendNearbyPlacesRequest(location){
 }
 
 /**
+ * Deprecated compatibility helper
+ * GET /api/my_location
+ * Request: none
+ * Response: { lat:number, lng:number }  or null
+ */
+export async function getMyLocation() {
+  const res = await axios.get(`${API_BASE}/my_location`);
+  return res.data;
+}
+
+/**
+ * Deprecated compatibility helper
+ * GET /api/nearby_places
+ * Request: none
+ * Response: array of places (see POST /api/nearby_places for preferred contract)
+ */
+export async function getNearbyPlaces() {
+  const res = await axios.get(`${API_BASE}/nearby_places`);
+  return res.data;
+}
+
+/**
  * GET /api/leaderboard
  * Request: none
  * Response: Array of leaderboard items: [ { id, name, score } ]
@@ -122,10 +71,7 @@ export async function getLeaderboard() {
 }
 
 export default {
-  getHealth,
   sendMessageToAssistant,
-  getMyLocation,
-  getNearbyPlaces,
   sendNearbyPlacesRequest,
   getLeaderboard,
 };

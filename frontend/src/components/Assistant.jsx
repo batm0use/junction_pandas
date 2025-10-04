@@ -48,25 +48,7 @@ export default function Assistant(){
     }
   }
 
-  async function fetchMyLocation(){
-    try{
-      const loc = await api.getMyLocation()
-      pushMessage('assistant', `My location: ${loc.x}, ${loc.y}`)
-    }catch(e){
-      pushMessage('assistant', 'Failed to fetch location')
-      console.error(e)
-    }
-  }
-
-  async function fetchNearby(){
-    try{
-      const places = await api.getNearbyPlaces()
-      pushMessage('assistant', `Nearby: ${JSON.stringify(places)}`)
-    }catch(e){
-      pushMessage('assistant', 'Failed to fetch nearby places')
-      console.error(e)
-    }
-  }
+  // removed location helpers — app now manages location and nearby places centrally
 
   // handle Enter (send) and Shift+Enter (newline)
   function handleKeyDown(e){
@@ -96,8 +78,6 @@ export default function Assistant(){
         />
         <div className="compose-actions">
           <button onClick={send} disabled={loading}>{loading ? '...' : 'Send'}</button>
-          <button onClick={fetchMyLocation} className="btn">My Location</button>
-          <button onClick={fetchNearby} className="btn">Nearby</button>
         </div>
       </div>
     </div>
