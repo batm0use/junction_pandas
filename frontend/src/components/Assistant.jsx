@@ -53,8 +53,6 @@ export default function Assistant(){
     }
   }
 
-  // removed location helpers — app now manages location and nearby places centrally
-
   // handle Enter (send) and Shift+Enter (newline)
   function handleKeyDown(e){
     if(e.key === 'Enter' && !e.shiftKey){
