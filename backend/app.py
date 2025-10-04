@@ -9,22 +9,20 @@ app = FastAPI(title="Backend API")
 
 # Mount the frontend build (Vite -> dist) at root if present. This lets the SPA handle client-side routes.
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-if FRONTEND_DIST.exists():
-  app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
 
+# Include API routes first so they take precedence over static files mounted at '/'
 app.include_router(router)
 
+if FRONTEND_DIST.exists():
+    # Mount static assets so files like /assets/xxx.js are served directly
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
 
-# SPA fallback: if a route wasn't matched by API or a static file, serve index.html so the client router can handle it.
-@app.middleware("http")
-async def spa_fallback(request: Request, call_next):
-  response = await call_next(request)
-  # If not found (404) and it's a GET for a page, return the SPA index
-  if response.status_code == 404 and request.method == "GET" and FRONTEND_DIST.exists():
-    index = FRONTEND_DIST / "index.html"
-    if index.exists():
-      return FileResponse(index)
-  return response
+    # Explicitly serve index.html only at the root path '/'. Other paths (e.g. /api/...) will be
+    # handled by FastAPI routes; unknown paths will return 404 instead of the SPA.
+    @app.get("/", include_in_schema=False)
+    async def serve_index():
+        index = FRONTEND_DIST / "index.html"
+        return FileResponse(index)
 
 
 def run(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
