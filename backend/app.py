@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+
 from backend.router.router import router
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +13,13 @@ app = FastAPI(title="Backend API")
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 # Include API routes first so they take precedence over static files mounted at '/'
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(router)
 
 if FRONTEND_DIST.exists():
