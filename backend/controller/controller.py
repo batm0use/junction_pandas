@@ -42,3 +42,4 @@ def leaderboard_scores() -> list[int]:
     list_scores = top_drivers()
     list_scores.sort(reverse=True)
     return list_scores
+
