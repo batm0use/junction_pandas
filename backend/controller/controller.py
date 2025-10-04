@@ -1,4 +1,4 @@
-from database.query import position_by_id, what_you_need
+from database.query import position_by_id, what_you_need, top_drivers
 from database.distances_calculation import nearest_merchants
 from typing import Dict
 
@@ -20,6 +20,8 @@ def nearby_locations(lat: float, lng: float, count: int = 3):
 
     results = []
     for i, x in enumerate(list_merchants):
+        if i > count:
+            break
         results.append({
             "id": x[0],
             "lat": round(x[2], 7),
@@ -27,3 +29,8 @@ def nearby_locations(lat: float, lng: float, count: int = 3):
             "name": f"Nearby {i}"
         })
     return results
+
+def leaderboard_scores() -> list[int]:
+    list_scores = top_drivers()
+    list_scores.sort(reverse=True)
+    return list_scores
