@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import *
+from backend.router.router import router
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -33,8 +33,6 @@ def run(host: str = "127.0.0.1", port: int = 8000, reload: bool = True):
       run()
     """
     import uvicorn
-    uvicorn.run("app:app", host=host, port=port, reload=reload)
+    uvicorn.run("backend.app:app", host=host, port=port, reload=reload)
 
 
-if __name__ == "__main__":
-    run()

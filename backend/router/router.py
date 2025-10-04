@@ -1,7 +1,9 @@
 from fastapi import APIRouter
-from controller.controller import get_health, greet_user
+from backend.controller.controller import get_health, greet_user, find_position
+from database.query import *
 
-router = APIRouter( tags=["api"])
+
+router = APIRouter(prefix="/api", tags=["api"])
 
 
 @router.get("/health")
@@ -12,3 +14,8 @@ async def health():
 @router.get("/greet/{name}")
 async def greet(name: str):
     return greet_user(name)
+ 
+@router.get("/position/{id}")
+async def position(id: str):
+    return find_position(id)
+
