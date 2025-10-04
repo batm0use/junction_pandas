@@ -1,0 +1,39 @@
+import sqlite3
+import pandas as pd
+from math import radians, sin, cos, sqrt, atan2
+from database.initializer import get_id
+
+def haversine(lat1, lon1, lat2, lon2):
+
+    R = 6371.0
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
+
+
+query = ("SELECT merchant_id, lat, lon  FROM merchants")
+def nearest_merchants(lat1,lon1):
+    conn = sqlite3.connect('uber.db')
+    cursor = conn.cursor()
+#    cursor = get_id()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    merchants = []
+    for row in rows:
+        merchant= row[0]
+        lat = row[1]
+        lon = row[2]
+
+        distance = haversine(lat1, lon1, lat, lon)
+
+        merchants.append([merchant, distance])
+
+    merchants = sorted(merchants, key = lambda x: x[1])
+    res= list(filter(lambda x: x[1]<10, merchants))
+    return res
+
+print(nearest_merchants(52.07, 4.4))
