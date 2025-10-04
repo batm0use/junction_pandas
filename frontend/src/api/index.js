@@ -8,8 +8,7 @@ export async function getHealth(){
 }
 
 export async function sendMessageToAssistant(message){
-  // placeholder - POST to your FastAPI endpoint when implemented
-  const res = await axios.post(`${API_BASE}/assistant`, { message })
+  const res = await axios.post(`${API_BASE}/assistant`, { "message" : message })
   return res.data
 }
 

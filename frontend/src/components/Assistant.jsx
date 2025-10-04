@@ -31,7 +31,8 @@ export default function Assistant(){
     pushMessage('user', input)
     try{
       const resp = await api.sendMessageToAssistant(input)
-      pushMessage('assistant', resp.reply || 'ok')
+      // backend returns { response: "..." }
+      pushMessage('assistant', (resp && resp.response) || 'ok')
     }catch(e){
       pushMessage('assistant', 'Error sending message')
       console.error(e)
