@@ -230,14 +230,14 @@ export default function App(){
       <div className="assistant-area">
         <Assistant extraContent={deliveries && deliveries.length > 0 ? (
           <>
-            <div className="msg assistant" style={{ width: '100%' }}>
+            <div className="msg assistant full-width">
               <div className="msg-text">
                 <Carousel items={deliveries} selectedId={selectedDelivery?.id} onSelect={(it) => setSelectedDelivery(it)} />
               </div>
             </div>
 
             {selectedDelivery && (
-              <div className="msg assistant" style={{ width: '100%', marginTop: 8 }}>
+              <div className="msg assistant full-width" style={{ marginTop: 8 }}>
                 <div className="msg-text">
                   <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedDelivery.name} — selected</div>
                   <div>Pickup: {selectedDelivery.lat_pickup.toFixed(6)}, {selectedDelivery.lng_pickup.toFixed(6)}</div>
