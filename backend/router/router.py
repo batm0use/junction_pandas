@@ -9,6 +9,7 @@ import random
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
+from backend.controller.reverse_geolocation import reverse_geocode
 from backend.controller.tts_controller import process_tts
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -178,3 +179,6 @@ async def generate_tts(text: Item):
     reply = process_tts(text)
     return reply
 
+@router.get("/reverse_geocode/{lat}/{lon}")
+async def reverse_geocode_router(lat: float, lon: float):
+    return reverse_geocode(lat, lon)

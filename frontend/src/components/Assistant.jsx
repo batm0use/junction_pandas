@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import api, {playTTS} from '../api'
+import api from './../api'
 import PropTypes from 'prop-types'
 
 /**
@@ -19,7 +19,7 @@ export default function Assistant({ extraContent }){
     const id = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`
     setMessages(prev => [...prev, { id, role, text }])
     if (role === "assistant")
-      playTTS(text).then();
+      api.playTTS(text).then();
   }
   // scroll to bottom when messages update
   useEffect(() => {

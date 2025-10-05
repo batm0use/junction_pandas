@@ -14,6 +14,30 @@ export async function sendMessageToAssistant(message) {
   return res.data;
 }
 
+export async function reverseGeoCoordinates(lat, lon) {
+  const res = await axios.get(`${API_BASE}/reverse_geocode/${lat}/${lon}`);
+  return res.data;
+}
+
+/**
+ * Send a message to the assistant backend endpoint.
+ * POST /api/assistant
+ * @param {string} message - user message text to send
+ * @returns {Promise<any>} - backend response body (often { response: string } or plain string)
+ */
+export async function playTTS(message) {
+    const res = await fetch(`${API_BASE}/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ "message": message }),
+    });
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.volume = 1;
+    return audio.play();
+  }
 
 
 // Send current location to backend and receive nearby places
@@ -71,6 +95,7 @@ export default {
   sendNearbyPlacesRequest,
   getLeaderboard,
   sendDeliveriesRequest,
-  getLeaderboardSummary,
-  playTTS,
+    playTTS,
+    reverseGeoCoordinates,
+  getLeaderboardSummary
 };
