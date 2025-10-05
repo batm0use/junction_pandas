@@ -154,11 +154,12 @@ body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe
 }
 
 .carousel-card-btn:focus{outline:2px solid rgba(124,92,255,0.28)}
-.carousel-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.carousel-card-header{display:flex;flex-direction:column;align-items:flex-start;margin-bottom:8px}
 .carousel-name{font-weight:700;color:var(--accent)}
 .carousel-etas{display:flex;gap:10px;margin-bottom:8px;color:var(--text)}
 .carousel-extra{font-size:13px;color:#cfe9d6;margin-bottom:8px}
 .carousel-actions{text-align:right}
+.carousel-late {color: yellow;display: block;margin-top: 6px;font-size:13px;line-height:1.1}
 
 /* small helper for empty carousel states */
 .carousel-empty{padding:8px;color:var(--muted)}

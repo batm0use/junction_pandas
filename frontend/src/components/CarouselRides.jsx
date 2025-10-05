@@ -17,6 +17,11 @@ export default function CarouselRides({ items, onSelect, selectedId }){
             <button className="carousel-card-btn" onClick={(e) => { e.stopPropagation(); onSelect(it) }}>
               <div className="carousel-card-header">
                 <div className="carousel-name">{it.name}</div>
+                {it.red ? 
+                ( <div className="carousel-late">WARNING: You won't be at home in time</div> )
+                :
+                ( <div className="carousel-late">miau: You won't be at home in time</div> )
+                }
               </div>
               <div className="carousel-etas">
                 <div className="eta">Arrive: <strong>{it.eta_arrive} min</strong></div>
