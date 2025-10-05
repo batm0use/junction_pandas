@@ -1,7 +1,7 @@
 from database import eta_food_creation
 from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
-    get_percentage, restaurants
+    get_percentage, restaurants, set_time
 from database.distances_calculation import estimate_eta, make_it_home
 from database.eta_food_creation import get_eta_for_food_by_merchant 
 from database.user import get_time_home, get_user_home
@@ -52,7 +52,7 @@ async def nearby_places(payload: LocationPayload):
     # This route generates demo points around the provided coordinates.
     return nearby_locations(payload.lat, payload.lng, count=5)
 
-def time_avail(time : int):
+def time_avail(time : str):
 
     # Get the current time
     now = datetime.now()
@@ -203,3 +203,7 @@ async def generate_tts(text: Item):
 @router.get("/reverse_geocode/{lat}/{lon}")
 async def reverse_geocode_router(lat: float, lon: float):
     return reverse_geocode(lat, lon)
+
+@router.post("/time")
+async def set_home_time(time : str):
+    set_time(time)
