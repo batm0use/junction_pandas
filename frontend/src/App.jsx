@@ -362,7 +362,7 @@ useEffect(() => {
       </aside>
 
       <div className="topbar">
-    <h1>UberBot</h1>
+    <h1>Uber Roadie</h1>
   <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} onGetDeliveries={fetchDeliveries} onGetRides={fetchRides}/>
       </div>
 
