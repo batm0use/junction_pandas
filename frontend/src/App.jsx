@@ -52,6 +52,7 @@ export default function App(){
   // loading state is not currently used in UI; keep internal lifecycle handling
   const [summary, setSummary] = useState([])
   const [preferredReturnTime, setPreferredReturnTime] = useState('')
+  const [savingTime, setSavingTime] = useState(false)
 
 
 useEffect(() => {
@@ -233,6 +234,32 @@ useEffect(() => {
         color: '#fff'
       }}
     />
+        <div style={{ marginTop: 8 }}>
+          <button className="btn" disabled={savingTime} onClick={async () => {
+            const re = /^([01]?\d|2[0-3]):([0-5]\d)$/
+            if (!re.test(preferredReturnTime)) {
+              showNotification('Invalid time', 'Please enter time in HH:MM format')
+              return
+            }
+            setSavingTime(true)
+            try {
+              const payload = { id: 1, time: preferredReturnTime }
+              const resp = await api.setPreferredReturnTime(payload)
+              if (resp && resp.status === 'ok') {
+                showNotification('Saved', `Preferred return time saved (${preferredReturnTime})`)
+              } else if (resp && resp.error) {
+                showNotification('Save failed', resp.error)
+              } else {
+                showNotification('Save', 'Unexpected response from server')
+              }
+            } catch (e) {
+              console.error(e)
+              showNotification('Save failed', 'Could not save preferred time')
+            } finally {
+              setSavingTime(false)
+            }
+          }}>Set time</button>
+        </div>
   </div>
 
 

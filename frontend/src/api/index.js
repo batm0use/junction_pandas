@@ -80,6 +80,20 @@ export async function getLeaderboardSummary(userId) {
 }
 
 /**
+ * Save preferred return time for a user.
+ * POST /api/preferred_return_time
+ * Request body: { id: number, time: 'HH:MM' }
+ */
+export async function setPreferredReturnTime(payload){
+  const res = await fetch(`${API_BASE}/preferred_return_time`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  return await res.json()
+}
+
+/**
  * POST /api/deliveries
  * Request body: { lat: number, lng: number }
  * Response: Array of delivery objects with fields:
