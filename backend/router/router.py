@@ -1,6 +1,9 @@
+from database import eta_food_creation
 from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
-    get_percentage
+    get_percentage, restaurants
+from database.distances_calculation import estimate_eta
+from database.eta_food_creation import get_eta_for_food_by_merchant
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
@@ -56,44 +59,33 @@ async def deliveries(payload: LocationPayload):
     # Server receives: { lat: float, lng: float }
     # Response: an array of delivery objects with eta and pickup/drop coordinates.
     # For now return a hardcoded/demo list using small offsets from the provided coords.
-    base_lat = payload.lat
-    base_lng = payload.lng
-    demo = [
-        {
-            "id": 101,
-            "name": "Bistro A",
-            "eta_food": 12,
-            "eta_arrive": 25,
-            "lat_pickup": base_lat + 0.0012,
-            "lng_pickup": base_lng + 0.0008,
-            "lat_drop": base_lat - 0.0006,
-            "lng_drop": base_lng + 0.0014,
-            "extra_info": "Main square, left of the fountain"
-        },
-        {
-            "id": 102,
-            "name": "Sushi Place",
-            "eta_food": 8,
-            "eta_arrive": 18,
-            "lat_pickup": base_lat + 0.0004,
-            "lng_pickup": base_lng - 0.0011,
-            "lat_drop": base_lat + 0.0009,
-            "lng_drop": base_lng - 0.0003,
-            "extra_info": "Apartment block B, intercom 203"
-        },
-        {
-            "id": 103,
-            "name": "Pizzeria",
-            "eta_food": 20,
-            "eta_arrive": 35,
-            "lat_pickup": base_lat - 0.0010,
-            "lng_pickup": base_lng - 0.0007,
-            "lat_drop": base_lat - 0.0015,
-            "lng_drop": base_lng + 0.0002,
-            "extra_info": "Behind the bakery, call on arrival"
-        }
-    ]
-    return demo
+
+#data = {}
+#data['key'] = 'value'
+#json_data = json.dumps(data)
+
+
+    lat = payload.lat
+    lng = payload.lng
+    names = ["bistrot A", "cafe B", "apothecary C"]
+    extra_info = ["take the second entrance to the left", "use small red door in the back", "enter the poorly lit hallway"]
+
+    db_info = restaurants() 
+    out_list = []
+    for i in range(0, len(db_info)):
+        data = {}
+        data['id'] = db_info[i][0]
+        data['name'] = names[i % 3]
+        data['eta_food'] = get_eta_for_food_by_merchant(db_info[i][0])
+        data['lat_pickup'] = db_info[i][1]
+        data['lng_pickup'] = db_info[i][2]
+        data['lat_drop'] = db_info[i][1] - 0.0006
+        data['lng_drop'] = db_info[i][2] + 0.0014
+        data['extra_info'] = extra_info[i % 3]
+        out_list.append(data)
+    print(out_list)
+
+    return out_list
 
 
 @router.get("/leaderboard")
@@ -136,6 +128,8 @@ async def rides_left(id: str):
     # Request: path param 'id' (string)
     # Response: remaining rides/count info for the id (implementation-specific)
     return remaining_rides(id)
+
+
 
 @router.post("/tts")
 async def generate_tts(text: Item):

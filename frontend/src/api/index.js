@@ -96,5 +96,6 @@ export default {
   getLeaderboard,
   sendDeliveriesRequest,
     playTTS,
-    reverseGeoCoordinates
+    reverseGeoCoordinates,
+  getLeaderboardSummary
 };
