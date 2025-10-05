@@ -6,7 +6,7 @@ import Controls from './components/Controls'
 import Notifications from './components/Notifications'
 
 import Carousel from './components/Carousel'
-import api from './api'
+import api, {playTTS} from './api'
 
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
@@ -49,11 +49,41 @@ export default function App(){
   const [selectedDelivery, setSelectedDelivery] = useState(null)
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pickupAddress, setPickupAddress] = useState("Loading...")
+  const [dropAddress, setDropAddress] = useState("Loading...");
   // loading state is not currently used in UI; keep internal lifecycle handling
   const [summary, setSummary] = useState([])
   const [preferredReturnTime, setPreferredReturnTime] = useState('')
   const [savingTime, setSavingTime] = useState(false)
 
+
+  useEffect(() => {
+    if (!selectedDelivery) return;
+
+    async function fetchAddress() {
+        setPickupAddress("Loading...");
+        setDropAddress("Loading...");
+      try {
+        const data = await api.reverseGeoCoordinates(
+          selectedDelivery.lat_pickup,
+          selectedDelivery.lng_pickup
+        );
+        setPickupAddress(data || "Unknown location");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const data2 = await api.reverseGeoCoordinates(
+          selectedDelivery.lat_drop,
+          selectedDelivery.lng_drop
+        );
+        setDropAddress(data2 || "Unknown location");
+      } catch (err) {
+        console.error(err);
+        setPickupAddress("Error fetching address");
+        setDropAddress("Error fetching address");
+      }
+    }
+
+    fetchAddress();
+  }, [selectedDelivery]);
 
 useEffect(() => {
   let mounted = true
@@ -164,7 +194,7 @@ useEffect(() => {
    */
   function triggerBreak(){
     setConfirmOpen(true);
-    api.playTTS(BREAK_MESSAGE).then();
+    playTTS(BREAK_MESSAGE).then();
   }
 
   /**
@@ -289,8 +319,8 @@ useEffect(() => {
               <div className="msg assistant full-width" style={{ marginTop: 8 }}>
                 <div className="msg-text">
                   <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedDelivery.name} — selected</div>
-                  <div>Pickup: TODO FIX</div>
-                  <div>Drop: {selectedDelivery.lat_drop.toFixed(6)}, {selectedDelivery.lng_drop.toFixed(6)}</div>
+                  <div>Pickup: {pickupAddress}</div>
+                  <div>Drop: {dropAddress}</div>
                   <div style={{ marginTop: 8, fontSize: 13, color: '#cfe9d6' }}>{selectedDelivery.extra_info}</div>
                 </div>
               </div>

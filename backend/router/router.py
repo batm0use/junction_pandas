@@ -1,22 +1,22 @@
 from database import eta_food_creation
 from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
-    get_percentage, restaurants
-from database.distances_calculation import estimate_eta
-from database.eta_food_creation import get_eta_for_food_by_merchant
+    get_percentage, restaurants, set_time
+from database.distances_calculation import estimate_eta, make_it_home
+from database.eta_food_creation import get_eta_for_food_by_merchant 
+from database.user import get_time_home, get_user_home
+import random
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
 from backend.controller.reverse_geolocation import reverse_geocode
 from backend.controller.tts_controller import process_tts
 from database.user import set_time_home
+from datetime import *
 
 router = APIRouter(prefix="/api", tags=["api"])
 
-class Item(BaseModel):
-    message : str
-
-
+class Item(BaseModel): message : str
 @router.post("/assistant")
 async def chat(message: Item):
     # POST /api/assistant
@@ -53,6 +53,67 @@ async def nearby_places(payload: LocationPayload):
     # This route generates demo points around the provided coordinates.
     return nearby_locations(payload.lat, payload.lng, count=5)
 
+def time_avail(time : str):
+
+    # Get the current time
+    now = datetime.now()
+    military_time = now.strftime("%H%M")
+    out = 0
+    out += (int(time) / 100  - int(military_time) / 100 ) * 60
+    out += (int(time) % 100 ) - (int(military_time) % 100 ) 
+    return out
+
+
+@router.post("/rides")
+async def rides(payload: LocationPayload):
+    # POST /api/rides
+    # Server receives: { lat: float, lng: float }
+    # Response: an array of delivery objects with eta and pickup/drop coordinates.
+    # For now return a hardcoded/demo list using small offsets from the provided coords.
+
+#data = {}
+#data['key'] = 'value'
+#json_data = json.dumps(data)
+
+    usr_end_time = get_time_home()
+
+    usr_home = get_user_home()
+    lat = payload.lat
+    lng = payload.lng
+    names = ["bistrot A", "cafe B", "apothecary C"]
+    extra_info = ["take the second entrance to the left", "use small red door in the back", "enter the poorly lit hallway"]
+
+    db_info = restaurants() 
+    out_list = []
+    for i in range(0, len(db_info)):
+        data = {}
+        data['id'] = db_info[i][0]
+        data['name'] = names[i % 3]
+        delta_lat = random.randrange(-90, 90) * 1e-3
+        delta_long = random.randrange(-90, 90) * 1e-3
+        green = False
+        red = True
+        if make_it_home(lat, lng, db_info[i][1], db_info[i][2], usr_home[0] , usr_home[1], 30, 1, time_avail(usr_end_time)):
+            red = False
+            green = True
+        else:
+            green = False
+            red = True
+        data['red'] =red
+        data['green'] = green
+        data['eta_arrive'] = estimate_eta(lat, lng, db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes") +  estimate_eta( db_info[i][1], db_info[i][2],  db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
+        data['lat_pickup'] = db_info[i][1]
+        data['lng_pickup'] = db_info[i][2]
+        data['lat_drop'] = db_info[i][1] + delta_lat
+        data['lng_drop'] = db_info[i][2] + delta_long
+        data['extra_info'] = extra_info[i % 3]
+        out_list.append(data)
+
+    return out_list
+
+
+
+
 
 @router.post("/deliveries")
 async def deliveries(payload: LocationPayload):
@@ -78,13 +139,15 @@ async def deliveries(payload: LocationPayload):
         data['id'] = db_info[i][0]
         data['name'] = names[i % 3]
         data['eta_food'] = get_eta_for_food_by_merchant(db_info[i][0])
+        delta_lat = random.randrange(-150, 150) * 1e-3
+        delta_long = random.randrange(-150, 150) * 1e-3
+        data['eta_arrive'] = estimate_eta(lat, lng,  db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes")
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
-        data['lat_drop'] = db_info[i][1] - 0.0006
-        data['lng_drop'] = db_info[i][2] + 0.0014
+        data['lat_drop'] = db_info[i][1] + delta_lat
+        data['lng_drop'] = db_info[i][2] + delta_long
         data['extra_info'] = extra_info[i % 3]
         out_list.append(data)
-    print(out_list)
 
     return out_list
 
@@ -173,3 +236,7 @@ async def preferred_return_time(payload: PreferredTimePayload):
 @router.get("/reverse_geocode/{lat}/{lon}")
 async def reverse_geocode_router(lat: float, lon: float):
     return reverse_geocode(lat, lon)
+
+@router.post("/time")
+async def set_home_time(time : str):
+    set_time(time)
