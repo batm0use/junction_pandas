@@ -6,7 +6,7 @@ import Controls from './components/Controls'
 import Notifications from './components/Notifications'
 
 import Carousel from './components/Carousel'
-import api, {playTTS} from './api'
+import api from './api'
 
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
@@ -161,7 +161,7 @@ useEffect(() => {
    */
   function triggerBreak(){
     setConfirmOpen(true);
-    playTTS(BREAK_MESSAGE).then();
+    api.playTTS(BREAK_MESSAGE).then();
   }
 
   /**
@@ -238,7 +238,7 @@ useEffect(() => {
               <div className="msg assistant full-width" style={{ marginTop: 8 }}>
                 <div className="msg-text">
                   <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedDelivery.name} — selected</div>
-                  <div>Pickup: {selectedDelivery.lat_pickup.toFixed(6)}, {selectedDelivery.lng_pickup.toFixed(6)}</div>
+                  <div>Pickup: TODO FIX</div>
                   <div>Drop: {selectedDelivery.lat_drop.toFixed(6)}, {selectedDelivery.lng_drop.toFixed(6)}</div>
                   <div style={{ marginTop: 8, fontSize: 13, color: '#cfe9d6' }}>{selectedDelivery.extra_info}</div>
                 </div>
