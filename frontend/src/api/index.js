@@ -80,19 +80,6 @@ export async function getLeaderboardSummary(userId) {
   return await response.json()
 }
 
-/**
- * Save preferred return time for a user.
- * POST /api/preferred_return_time
- * Request body: { id: number, time: 'HH:MM' }
- */
-export async function setPreferredReturnTime(payload){
-  const res = await fetch(`${API_BASE}/preferred_return_time`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  return await res.json()
-}
 
 /**
  * POST /api/deliveries
@@ -105,12 +92,26 @@ export async function sendDeliveriesRequest(location){
   return res.data
 }
 
+/**
+ * POST a plain time string to /api/time. Backend expects { message: string }
+ * where message is HHMM (e.g. '1730').
+ */
+export async function postTimeString(timeString){
+  const res = await fetch(`${API_BASE}/time`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: timeString })
+  })
+  return await res.json()
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
   getLeaderboard,
   sendDeliveriesRequest,
-    playTTS,
-    reverseGeoCoordinates,
-  getLeaderboardSummary
+  playTTS,
+  reverseGeoCoordinates,
+  getLeaderboardSummary,
+  postTimeString
 };

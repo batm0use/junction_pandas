@@ -266,25 +266,29 @@ useEffect(() => {
     />
         <div style={{ marginTop: 8 }}>
           <button className="btn" disabled={savingTime} onClick={async () => {
-            const re = /^([01]?\d|2[0-3]):([0-5]\d)$/
-            if (!re.test(preferredReturnTime)) {
-              showNotification('Invalid time', 'Please enter time in HH:MM format')
+            // Accept HHMM (e.g. 1730) or HH:MM (e.g. 17:30). Normalize to HHMM.
+            const raw = preferredReturnTime.trim()
+            let hhmm = raw
+            // If format HH:MM -> remove colon
+            if (/^[0-2]?\d:[0-5]\d$/.test(raw)) {
+              hhmm = raw.replace(':', '')
+            }
+            // If 3-digit like '930' -> pad to '0930'
+            if (/^\d{3}$/.test(hhmm)) hhmm = '0' + hhmm
+            // Validate final HHMM
+            if (!/^[0-2]?\d[0-5]\d$/.test(hhmm)) {
+              showNotification('Invalid time', 'Please enter time in HHMM or HH:MM format')
               return
             }
+
             setSavingTime(true)
             try {
-              const payload = { id: 1, time: preferredReturnTime }
-              const resp = await api.setPreferredReturnTime(payload)
-              if (resp && resp.status === 'ok') {
-                showNotification('Saved', `Preferred return time saved (${preferredReturnTime})`)
-              } else if (resp && resp.error) {
-                showNotification('Save failed', resp.error)
-              } else {
-                showNotification('Save', 'Unexpected response from server')
-              }
+              // Send plain string to /api/time as { message: hhmm }
+              await api.postTimeString(hhmm)
+              showNotification('Saved', `Time sent: ${hhmm}`)
             } catch (e) {
               console.error(e)
-              showNotification('Save failed', 'Could not save preferred time')
+              showNotification('Save failed', 'Could not send time to server')
             } finally {
               setSavingTime(false)
             }
