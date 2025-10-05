@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from backend.controller.ai import ask_ai
 from backend.controller.reverse_geolocation import reverse_geocode
 from backend.controller.tts_controller import process_tts
+from database.user import set_time_home
 from datetime import *
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -199,6 +200,38 @@ async def generate_tts(text: Item):
     text = text.message
     reply = process_tts(text)
     return reply
+
+
+class PreferredTimePayload(BaseModel):
+    id: int
+    time: str
+
+
+@router.post("/preferred_return_time")
+async def preferred_return_time(payload: PreferredTimePayload):
+    """Accepts payload { id: int, time: 'HH:MM' } and stores the preferred return time.
+
+    Converts HH:MM into integer minutes since midnight and calls `set_time_home(minutes)`.
+    """
+    t = payload.time
+    try:
+        parts = t.split(":")
+        if len(parts) != 2:
+            raise ValueError("invalid format")
+        hh = int(parts[0])
+        mm = int(parts[1])
+        if hh < 0 or hh > 23 or mm < 0 or mm > 59:
+            raise ValueError("out of range")
+        minutes = hh * 60 + mm
+    except Exception:
+        return {"error": "invalid time format, expected HH:MM"}
+
+    try:
+        set_time_home(minutes)
+    except Exception as e:
+        return {"error": f"failed to save: {e}"}
+
+    return {"status": "ok", "saved_minutes": minutes}
 
 @router.get("/reverse_geocode/{lat}/{lon}")
 async def reverse_geocode_router(lat: float, lon: float):

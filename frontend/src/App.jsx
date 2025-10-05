@@ -53,6 +53,9 @@ export default function App(){
   const [dropAddress, setDropAddress] = useState("Loading...");
   // loading state is not currently used in UI; keep internal lifecycle handling
   const [summary, setSummary] = useState([])
+  const [preferredReturnTime, setPreferredReturnTime] = useState('')
+  const [savingTime, setSavingTime] = useState(false)
+
 
   useEffect(() => {
     if (!selectedDelivery) return;
@@ -242,6 +245,54 @@ useEffect(() => {
       <aside className="sidebar">
         <h2>Your Progress</h2>
         <Leaderboard summary={summary} />
+        <div style={{ marginTop: 20 }}>
+    <label htmlFor="return-time" style={{ display: 'block', marginBottom: 6 }}>
+      Preferred return time:
+    </label>
+    <input
+      id="return-time"
+      type="text"
+      value={preferredReturnTime}
+      onChange={(e) => setPreferredReturnTime(e.target.value)}
+      placeholder="e.g. 17:30"
+      style={{
+        width: '100%',
+        padding: '6px 10px',
+        borderRadius: 4,
+        border: '1px solid #ccc',
+        backgroundColor: '#1e1e1e',
+        color: '#fff'
+      }}
+    />
+        <div style={{ marginTop: 8 }}>
+          <button className="btn" disabled={savingTime} onClick={async () => {
+            const re = /^([01]?\d|2[0-3]):([0-5]\d)$/
+            if (!re.test(preferredReturnTime)) {
+              showNotification('Invalid time', 'Please enter time in HH:MM format')
+              return
+            }
+            setSavingTime(true)
+            try {
+              const payload = { id: 1, time: preferredReturnTime }
+              const resp = await api.setPreferredReturnTime(payload)
+              if (resp && resp.status === 'ok') {
+                showNotification('Saved', `Preferred return time saved (${preferredReturnTime})`)
+              } else if (resp && resp.error) {
+                showNotification('Save failed', resp.error)
+              } else {
+                showNotification('Save', 'Unexpected response from server')
+              }
+            } catch (e) {
+              console.error(e)
+              showNotification('Save failed', 'Could not save preferred time')
+            } finally {
+              setSavingTime(false)
+            }
+          }}>Set time</button>
+        </div>
+  </div>
+
+
       </aside>
 
       <div className="topbar">
