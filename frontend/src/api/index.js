@@ -14,6 +14,11 @@ export async function sendMessageToAssistant(message) {
   return res.data;
 }
 
+export async function reverseGeoCoordinates(lat, lon) {
+  const res = await axios.get(`${API_BASE}/reverse_geocode/${lat}/${lon}`);
+  return res.data;
+}
+
 /**
  * Send a message to the assistant backend endpoint.
  * POST /api/assistant
@@ -90,4 +95,6 @@ export default {
   sendNearbyPlacesRequest,
   getLeaderboard,
   sendDeliveriesRequest,
+    playTTS,
+    reverseGeoCoordinates
 };
