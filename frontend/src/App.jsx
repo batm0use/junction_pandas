@@ -51,6 +51,8 @@ export default function App(){
   const [confirmOpen, setConfirmOpen] = useState(false)
   // loading state is not currently used in UI; keep internal lifecycle handling
   const [summary, setSummary] = useState([])
+  const [preferredReturnTime, setPreferredReturnTime] = useState('')
+
 
 useEffect(() => {
   let mounted = true
@@ -212,6 +214,28 @@ useEffect(() => {
       <aside className="sidebar">
         <h2>Your Progress</h2>
         <Leaderboard summary={summary} />
+        <div style={{ marginTop: 20 }}>
+    <label htmlFor="return-time" style={{ display: 'block', marginBottom: 6 }}>
+      Preferred return time:
+    </label>
+    <input
+      id="return-time"
+      type="text"
+      value={preferredReturnTime}
+      onChange={(e) => setPreferredReturnTime(e.target.value)}
+      placeholder="e.g. 17:30"
+      style={{
+        width: '100%',
+        padding: '6px 10px',
+        borderRadius: 4,
+        border: '1px solid #ccc',
+        backgroundColor: '#1e1e1e',
+        color: '#fff'
+      }}
+    />
+  </div>
+
+
       </aside>
 
       <div className="topbar">
