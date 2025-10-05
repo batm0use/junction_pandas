@@ -8,6 +8,7 @@ import Notifications from './components/Notifications'
 import Carousel from './components/Carousel'
 import CarouselRides from './components/CarouselRides'
 import api, {playTTS} from './api'
+import logo from './components/uber_assistant_logo.png'
 
 
 const DEFAULT_LOCATION = { lat: 51.9995, lng: 4.3625 } // Delft
@@ -58,6 +59,12 @@ export default function App(){
   const [summary, setSummary] = useState([])
   const [preferredReturnTime, setPreferredReturnTime] = useState('')
   const [savingTime, setSavingTime] = useState(false)
+  // splash screen state
+  const [showSplash, setShowSplash] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setShowSplash(false), 1000) // show 1s then hide
+    return () => clearTimeout(t)
+  }, [])
 
 
   useEffect(() => {
@@ -293,6 +300,10 @@ useEffect(() => {
 
   return (
     <div className="app-root dark">
+      {/* Splash overlay */}
+      <div className={`splash ${showSplash ? 'visible' : 'hidden'}`}>
+        <img src={logo} alt="logo" className="splash-logo" />
+      </div>
       <aside className="sidebar">
         <h2>Your Progress</h2>
         <Leaderboard summary={summary} />
