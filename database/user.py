@@ -1,5 +1,5 @@
 from database.initializer import get_id
-def current_user_home():
+def get_user_home():
     cursor = get_id()
     query = ("SELECT lat_home, lng_home FROM user")
 
