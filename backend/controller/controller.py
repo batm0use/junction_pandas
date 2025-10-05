@@ -1,6 +1,7 @@
 from database.query import position_by_id, what_you_need, top_drivers, calculate_percentile
 from database.distances_calculation import nearest_merchants
 from database.eta_food_creation import get_restaurant_info
+from database.user import set_time_home
 from typing import Dict
 
 PERCENTAGE = 0.25
@@ -19,6 +20,10 @@ def get_leaderboard_summary(id: str) -> Dict[str, int]:
         "remaining": what_you_need(id, PERCENTAGE),
         "percentile": calculate_percentile(id)
     }
+
+def set_time(time :str):
+    set_time_home(time)
+
 
 def nearby_locations(lat: float, lng: float, count: int = 3):
     """Return a small list of demo nearby points around the provided lat/lng.
