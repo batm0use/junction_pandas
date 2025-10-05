@@ -5,7 +5,7 @@ from gtts import gTTS
 
 
 def process_tts(text : str):
-    lang = "it"
+    lang = "en"
 
     # Generate temporary mp3 file
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")

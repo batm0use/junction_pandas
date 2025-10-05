@@ -101,7 +101,7 @@ async def rides(payload: LocationPayload):
             red = True
         data['red'] =red
         data['green'] = green
-        data['eta_arrive'] = estimate_eta(lat, lng, db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes") +  estimate_eta( db_info[i][1], db_info[i][2],  db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
+        data['eta_arrive'] = round(estimate_eta(lat, lng, db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes") +  estimate_eta( db_info[i][1], db_info[i][2],  db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes"))
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
         data['lat_drop'] = db_info[i][1] + delta_lat
@@ -138,10 +138,10 @@ async def deliveries(payload: LocationPayload):
         data = {}
         data['id'] = db_info[i][0]
         data['name'] = names[i % 3]
-        data['eta_food'] = get_eta_for_food_by_merchant(db_info[i][0])
+        data['eta_food'] = round(get_eta_for_food_by_merchant(db_info[i][0]))
         delta_lat = random.randrange(-150, 150) * 1e-3
         delta_long = random.randrange(-150, 150) * 1e-3
-        data['eta_arrive'] = estimate_eta(lat, lng,  db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes")
+        data['eta_arrive'] = round(estimate_eta(lat, lng,  db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes"))
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
         data['lat_drop'] = db_info[i][1] + delta_lat
