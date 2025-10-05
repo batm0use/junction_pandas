@@ -4,6 +4,7 @@ from backend.controller.controller import find_position, remaining_rides, nearby
     get_percentage, restaurants
 from database.distances_calculation import estimate_eta
 from database.eta_food_creation import get_eta_for_food_by_merchant 
+from database.user import get_time_home, get_user_home
 import random
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
@@ -49,6 +50,47 @@ async def nearby_places(payload: LocationPayload):
     # This route generates demo points around the provided coordinates.
     return nearby_locations(payload.lat, payload.lng, count=5)
 
+@router.post("/rides")
+async def rides(payload: LocationPayload):
+    # POST /api/rides
+    # Server receives: { lat: float, lng: float }
+    # Response: an array of delivery objects with eta and pickup/drop coordinates.
+    # For now return a hardcoded/demo list using small offsets from the provided coords.
+
+#data = {}
+#data['key'] = 'value'
+#json_data = json.dumps(data)
+
+    usr_end_time = get_time_home()
+    usr_home = get_user_home()
+    lat = payload.lat
+    lng = payload.lng
+    names = ["bistrot A", "cafe B", "apothecary C"]
+    extra_info = ["take the second entrance to the left", "use small red door in the back", "enter the poorly lit hallway"]
+
+    db_info = restaurants() 
+    out_list = []
+    for i in range(0, len(db_info)):
+        data = {}
+        data['id'] = db_info[i][0]
+        data['name'] = names[i % 3]
+        data['red'] = False
+        data['green'] = False
+        delta_lat = random.randrange(-150, 150) * 1e-3
+        delta_long = random.randrange(-150, 150) * 1e-3
+        data['eta_arrive'] = estimate_eta(lat, lng, db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes") +  estimate_eta( db_info[i][1], db_info[i][2],  db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
+        data['lat_pickup'] = db_info[i][1]
+        data['lng_pickup'] = db_info[i][2]
+        data['lat_drop'] = db_info[i][1] + delta_lat
+        data['lng_drop'] = db_info[i][2] + delta_long
+        data['extra_info'] = extra_info[i % 3]
+        out_list.append(data)
+
+    return out_list
+
+
+
+
 
 @router.post("/deliveries")
 async def deliveries(payload: LocationPayload):
@@ -76,14 +118,13 @@ async def deliveries(payload: LocationPayload):
         data['eta_food'] = get_eta_for_food_by_merchant(db_info[i][0])
         delta_lat = random.randrange(-150, 150) * 1e-3
         delta_long = random.randrange(-150, 150) * 1e-3
-        data['eta_arrive'] = estimate_eta( db_info[i][1], db_info[i][2], db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
+        data['eta_arrive'] = estimate_eta(lat, lng,  db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes")
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
         data['lat_drop'] = db_info[i][1] + delta_lat
         data['lng_drop'] = db_info[i][2] + delta_long
         data['extra_info'] = extra_info[i % 3]
         out_list.append(data)
-    print(out_list)
 
     return out_list
 
