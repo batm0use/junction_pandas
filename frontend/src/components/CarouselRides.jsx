@@ -20,7 +20,7 @@ export default function CarouselRides({ items, onSelect, selectedId }){
                 {it.red ? 
                 ( <div className="carousel-late">WARNING: You won't be at home in time</div> )
                 :
-                ( <div className="carousel-late">miau: You won't be at home in time</div> )
+                ( "" )
                 }
               </div>
               <div className="carousel-etas">
