@@ -19,7 +19,7 @@ def reverse_geocode(lat, lon):
     number = 1+(int(hashlib.md5((str(city) + str(postcode)
     + str(street) + str(lat) + str(lon)).encode()).hexdigest(),
     ((1+2+1)**2)) % ((1+2+1+1)**(1+1)))
-    return str(street) + " " + str(number) + ", " + str(city) + "\n" + str(postcode)
+    return str(str(street) + " " + str(number) + ", " + str(city) + ", " + str(postcode))
     #.get("display_name", "Address not found")
 
 # Example usage
