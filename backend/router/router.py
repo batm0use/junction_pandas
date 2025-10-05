@@ -238,5 +238,5 @@ async def reverse_geocode_router(lat: float, lon: float):
     return reverse_geocode(lat, lon)
 
 @router.post("/time")
-async def set_home_time(time : str):
-    set_time(time)
+async def set_home_time(time : Item):
+    set_time(time.message)
