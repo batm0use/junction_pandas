@@ -56,6 +56,9 @@ export default function App(){
   const [dropAddress, setDropAddress] = useState("Loading...");
   // loading state is not currently used in UI; keep internal lifecycle handling
   const [summary, setSummary] = useState([])
+  const [preferredReturnTime, setPreferredReturnTime] = useState('')
+  const [savingTime, setSavingTime] = useState(false)
+
 
   useEffect(() => {
     if (!selectedDelivery) return;
@@ -293,6 +296,58 @@ useEffect(() => {
       <aside className="sidebar">
         <h2>Your Progress</h2>
         <Leaderboard summary={summary} />
+        <div style={{ marginTop: 20 }}>
+    <label htmlFor="return-time" style={{ display: 'block', marginBottom: 6 }}>
+      Preferred return time:
+    </label>
+    <input
+      id="return-time"
+      type="text"
+      value={preferredReturnTime}
+      onChange={(e) => setPreferredReturnTime(e.target.value)}
+      placeholder="e.g. 17:30"
+      style={{
+        width: '100%',
+        padding: '6px 10px',
+        borderRadius: 4,
+        border: '1px solid #ccc',
+        backgroundColor: '#1e1e1e',
+        color: '#fff'
+      }}
+    />
+        <div style={{ marginTop: 8 }}>
+          <button className="btn" disabled={savingTime} onClick={async () => {
+            // Accept HHMM (e.g. 1730) or HH:MM (e.g. 17:30). Normalize to HHMM.
+            const raw = preferredReturnTime.trim()
+            let hhmm = raw
+            // If format HH:MM -> remove colon
+            if (/^[0-2]?\d:[0-5]\d$/.test(raw)) {
+              hhmm = raw.replace(':', '')
+            }
+            // If 3-digit like '930' -> pad to '0930'
+            if (/^\d{3}$/.test(hhmm)) hhmm = '0' + hhmm
+            // Validate final HHMM
+            if (!/^[0-2]?\d[0-5]\d$/.test(hhmm)) {
+              showNotification('Invalid time', 'Please enter time in HHMM or HH:MM format')
+              return
+            }
+
+            setSavingTime(true)
+            try {
+              // Send plain string to /api/time as { message: hhmm }
+              await api.postTimeString(hhmm)
+              showNotification('Saved', `Time sent: ${hhmm}`)
+            } catch (e) {
+              console.error(e)
+              showNotification('Save failed', 'Could not send time to server')
+            } finally {
+              setSavingTime(false)
+            }
+          }}>Set time</button>
+        </div>
+  </div>
+
+
       </aside>
 
       <div className="topbar">

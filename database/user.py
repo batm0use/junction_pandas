@@ -16,7 +16,7 @@ def current_user_trips():
     row = cursor.fetchall()[0]
     return row[0]
 
-def set_time_home(time : int):
+def set_time_home(time : str):
     cursor = get_id()
     query = ("UPDATE user SET time_home = ?")
     cursor.execute(query, (time, ))

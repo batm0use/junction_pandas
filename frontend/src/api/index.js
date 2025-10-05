@@ -96,6 +96,19 @@ export async function sendRidesRequest(location){
   return res.data
 }
 
+/**
+ * POST a plain time string to /api/time. Backend expects { message: string }
+ * where message is HHMM (e.g. '1730').
+ */
+export async function postTimeString(timeString){
+  const res = await fetch(`${API_BASE}/time`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: timeString })
+  })
+  return await res.json()
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
@@ -104,5 +117,6 @@ export default {
     sendRidesRequest,
     playTTS,
     reverseGeoCoordinates,
-  getLeaderboardSummary
+  getLeaderboardSummary,
+  postTimeString
 };
