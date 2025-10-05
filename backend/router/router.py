@@ -2,7 +2,7 @@ from database import eta_food_creation
 from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
     get_percentage, restaurants
-from database.distances_calculation import estimate_eta
+from database.distances_calculation import estimate_eta, make_it_home
 from database.eta_food_creation import get_eta_for_food_by_merchant 
 from database.user import get_time_home, get_user_home
 import random
@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from backend.controller.ai import ask_ai
 from backend.controller.reverse_geolocation import reverse_geocode
 from backend.controller.tts_controller import process_tts
+from datetime import *
 
 router = APIRouter(prefix="/api", tags=["api"])
 
@@ -51,6 +52,17 @@ async def nearby_places(payload: LocationPayload):
     # This route generates demo points around the provided coordinates.
     return nearby_locations(payload.lat, payload.lng, count=5)
 
+def time_avail(time : int):
+
+    # Get the current time
+    now = datetime.now()
+    military_time = now.strftime("%H%M")
+    out = 0
+    out += (int(time) / 100  - int(military_time) / 100 ) * 60
+    out += (int(time) % 100 ) - (int(military_time) % 100 ) 
+    return out
+
+
 @router.post("/rides")
 async def rides(payload: LocationPayload):
     # POST /api/rides
@@ -63,6 +75,7 @@ async def rides(payload: LocationPayload):
 #json_data = json.dumps(data)
 
     usr_end_time = get_time_home()
+
     usr_home = get_user_home()
     lat = payload.lat
     lng = payload.lng
@@ -75,10 +88,18 @@ async def rides(payload: LocationPayload):
         data = {}
         data['id'] = db_info[i][0]
         data['name'] = names[i % 3]
-        data['red'] = False
-        data['green'] = False
-        delta_lat = random.randrange(-150, 150) * 1e-3
-        delta_long = random.randrange(-150, 150) * 1e-3
+        delta_lat = random.randrange(-90, 90) * 1e-3
+        delta_long = random.randrange(-90, 90) * 1e-3
+        green = False
+        red = True
+        if make_it_home(lat, lng, db_info[i][1], db_info[i][2], usr_home[0] , usr_home[1], 30, 1, time_avail(usr_end_time)):
+            red = False
+            green = True
+        else:
+            green = False
+            red = True
+        data['red'] =red
+        data['green'] = green
         data['eta_arrive'] = estimate_eta(lat, lng, db_info[i][1], db_info[i][2], 30, 1 ).get("eta_minutes") +  estimate_eta( db_info[i][1], db_info[i][2],  db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
