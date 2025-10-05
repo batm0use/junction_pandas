@@ -16,6 +16,7 @@ export async function sendMessageToAssistant(message) {
 
 export async function reverseGeoCoordinates(lat, lon) {
   const res = await axios.get(`${API_BASE}/reverse_geocode/${lat}/${lon}`);
+  console.log(typeof res.data)
   return res.data;
 }
 
