@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
  * Handles composing messages, sending them to the assistant API, and rendering replies.
  * @returns {JSX.Element}
  */
-export default function Assistant({ extraContent }){
+export default function Assistant({ extraContent, extraContentRides }){
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -74,6 +74,7 @@ export default function Assistant({ extraContent }){
 
         {/* Render any externally injected content (e.g., carousel) as part of the chat */}
         {extraContent}
+        {extraContentRides}
       </div>
 
       <div className="compose">

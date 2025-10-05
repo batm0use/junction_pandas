@@ -31,7 +31,7 @@ FlyToLocation.propTypes = {
  * @param {{myLocation:{lat:number,lng:number}, points:Array<{id:number,lat:number,lng:number,name:string}>}} props
  * @returns {JSX.Element}
  */
-export default function MapView({ myLocation, points, selectedDelivery }){
+export default function MapView({ myLocation, points, selectedDelivery, selectedRide }){
   const center = myLocation ? [myLocation.lat, myLocation.lng] : DELFT_CENTER
 
   const renderPoints = points?.length ? points : []
@@ -68,12 +68,27 @@ export default function MapView({ myLocation, points, selectedDelivery }){
           </>
         )}
 
+        {selectedRide && (
+          <>
+            <CircleMarker center={[selectedRide.lat_pickup, selectedRide.lng_pickup]} radius={8} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: 0.95 }}>
+              <Popup>Pickup: {selectedRide.name}</Popup>
+            </CircleMarker>
+            <CircleMarker center={[selectedRide.lat_drop, selectedRide.lng_drop]} radius={8} pathOptions={{ color: 'orange', fillColor: 'orange', fillOpacity: 0.95 }}>
+              <Popup>Drop: {selectedRide.name}</Popup>
+            </CircleMarker>
+          </>
+        )}
+
         {/* Fly to user's location by default */}
         <FlyToLocation location={myLocation} />
 
         {/* When a delivery is selected, fly to the pickup location */}
         {selectedDelivery && (
           <FlyToLocation location={{ lat: selectedDelivery.lat_pickup, lng: selectedDelivery.lng_pickup }} />
+        )}
+
+        {selectedRide && (
+          <FlyToLocation location={{ lat: selectedRide.lat_pickup, lng: selectedRide.lng_pickup }} />
         )}
       </MapContainer>
     </div>
@@ -84,10 +99,12 @@ MapView.propTypes = {
   myLocation: PropTypes.shape({ lat: PropTypes.number, lng: PropTypes.number }),
   points: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), lat: PropTypes.number, lng: PropTypes.number, name: PropTypes.string })),
   selectedDelivery: PropTypes.shape({ id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, eta_food: PropTypes.number, eta_arrive: PropTypes.number, lat_pickup: PropTypes.number, lng_pickup: PropTypes.number, lat_drop: PropTypes.number, lng_drop: PropTypes.number, extra_info: PropTypes.string }),
+  selectedRide: PropTypes.shape({ id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, eta_food: PropTypes.number, green: PropTypes.bool, red: PropTypes.bool, lat_pickup: PropTypes.number, lng_pickup: PropTypes.number, lat_drop: PropTypes.number, lng_drop: PropTypes.number, extra_info: PropTypes.string }),
 }
 
 MapView.defaultProps = {
   myLocation: null,
   points: null,
   selectedDelivery: null,
+  selectedRide: null,
 }

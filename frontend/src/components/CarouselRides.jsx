@@ -6,8 +6,8 @@ import PropTypes from 'prop-types'
  * Styled to be the maximum reasonable width of the chat column.
  * @param {{items:Array, onSelect:Function, selectedId: (string|number)}} props
  */
-export default function Carousel({ items, onSelect, selectedId }){
-  if(!items || items.length === 0) return <div className="carousel-empty">No deliveries</div>
+export default function CarouselRides({ items, onSelect, selectedId }){
+  if(!items || items.length === 0) return <div className="carousel-empty">No rides</div>
 
   return (
     <div className="carousel-wrapper">
@@ -19,7 +19,6 @@ export default function Carousel({ items, onSelect, selectedId }){
                 <div className="carousel-name">{it.name}</div>
               </div>
               <div className="carousel-etas">
-                <div className="eta">Food: <strong>{it.eta_food} min</strong></div>
                 <div className="eta">Arrive: <strong>{it.eta_arrive} min</strong></div>
               </div>
               <div className="carousel-extra">{it.extra_info}</div>
@@ -31,10 +30,10 @@ export default function Carousel({ items, onSelect, selectedId }){
   )
 }
 
-Carousel.propTypes = {
+CarouselRides.propTypes = {
   items: PropTypes.array,
   onSelect: PropTypes.func,
   selectedId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }
 
-Carousel.defaultProps = { items: [], onSelect: () => {}, selectedId: null }
+CarouselRides.defaultProps = { items: [], onSelect: () => {}, selectedId: null }

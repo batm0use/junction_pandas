@@ -91,11 +91,17 @@ export async function sendDeliveriesRequest(location){
   return res.data
 }
 
+export async function sendRidesRequest(location){
+  const res = await axios.post(`${API_BASE}/rides`, location)
+  return res.data
+}
+
 export default {
   sendMessageToAssistant,
   sendNearbyPlacesRequest,
   getLeaderboard,
   sendDeliveriesRequest,
+    sendRidesRequest,
     playTTS,
     reverseGeoCoordinates,
   getLeaderboardSummary
