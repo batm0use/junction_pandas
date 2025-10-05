@@ -1,4 +1,4 @@
-# Junction — Uber Assistant (Hackathon)
+# Junction — Uber Roadie
 
 This repository contains a prototype assistant for earners (drivers / couriers) that helps improve earnings, safety and efficiency via an in-app assistant, delivery scoring, ETA estimation, and a small set of nudges (break reminders, nearby partner offers).
 
