@@ -5,7 +5,7 @@ from database.initializer import get_id
 
 def haversine(lat1, lon1, lat2, lon2):
 
-    a = 78
+
     R = 6371.0
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
