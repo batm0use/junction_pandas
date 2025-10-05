@@ -3,7 +3,8 @@ from fastapi import APIRouter
 from backend.controller.controller import find_position, remaining_rides, nearby_locations, leaderboard_scores, \
     get_percentage, restaurants
 from database.distances_calculation import estimate_eta
-from database.eta_food_creation import get_eta_for_food_by_merchant
+from database.eta_food_creation import get_eta_for_food_by_merchant 
+import random
 # keep router focused; controller and DB helpers are imported where needed
 from pydantic import BaseModel
 from backend.controller.ai import ask_ai
@@ -11,10 +12,7 @@ from backend.controller.tts_controller import process_tts
 
 router = APIRouter(prefix="/api", tags=["api"])
 
-class Item(BaseModel):
-    message : str
-
-
+class Item(BaseModel): message : str
 @router.post("/assistant")
 async def chat(message: Item):
     # POST /api/assistant
@@ -76,10 +74,13 @@ async def deliveries(payload: LocationPayload):
         data['id'] = db_info[i][0]
         data['name'] = names[i % 3]
         data['eta_food'] = get_eta_for_food_by_merchant(db_info[i][0])
+        delta_lat = random.randrange(-150, 150) * 1e-3
+        delta_long = random.randrange(-150, 150) * 1e-3
+        data['eta_arrive'] = estimate_eta( db_info[i][1], db_info[i][2], db_info[i][1] + delta_lat, db_info[i][2] + delta_long, 30, 1 ).get("eta_minutes")
         data['lat_pickup'] = db_info[i][1]
         data['lng_pickup'] = db_info[i][2]
-        data['lat_drop'] = db_info[i][1] - 0.0006
-        data['lng_drop'] = db_info[i][2] + 0.0014
+        data['lat_drop'] = db_info[i][1] + delta_lat
+        data['lng_drop'] = db_info[i][2] + delta_long
         data['extra_info'] = extra_info[i % 3]
         out_list.append(data)
     print(out_list)
