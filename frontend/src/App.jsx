@@ -6,6 +6,7 @@ import Controls from './components/Controls'
 import Notifications from './components/Notifications'
 
 import Carousel from './components/Carousel'
+import CarouselRides from './components/CarouselRides'
 import api, {playTTS} from './api'
 
 
@@ -45,8 +46,10 @@ export default function App(){
   const [myLocation, setMyLocation] = useState(null)
   const [nearby, setNearby] = useState([])
   const [deliveries, setDeliveries] = useState([])
+  const [rides, setRides] = useState([])
   const [leaderboard, setLeaderboard] = useState([])
   const [selectedDelivery, setSelectedDelivery] = useState(null)
+  const [selectedRide, setSelectedRide] = useState(null)
   const [notifications, setNotifications] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pickupAddress, setPickupAddress] = useState("Loading...")
@@ -85,6 +88,33 @@ export default function App(){
     fetchAddress();
   }, [selectedDelivery]);
 
+  useEffect(() => {
+    if (!selectedRide) return;
+
+    async function fetchAddress() {
+        setPickupAddress("Loading...");
+        setDropAddress("Loading...");
+      try {
+        const data = await api.reverseGeoCoordinates(
+          selectedRide.lat_pickup,
+          selectedRide.lng_pickup
+        );
+        setPickupAddress(data || "Unknown location");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const data2 = await api.reverseGeoCoordinates(
+          selectedRide.lat_drop,
+          selectedRide.lng_drop
+        );
+        setDropAddress(data2 || "Unknown location");
+      } catch (err) {
+        console.error(err);
+        setPickupAddress("Error fetching address");
+        setDropAddress("Error fetching address");
+      }
+    }
+
+    fetchAddress();
+  }, [selectedRide]);
 useEffect(() => {
   let mounted = true
 
@@ -162,6 +192,10 @@ useEffect(() => {
    */
   async function fetchDeliveries(){
     if(!myLocation) return
+      setDeliveries([])
+      setRides([])
+      setSelectedDelivery(null)
+      setSelectedRide(null)
     try{
       const list = await api.sendDeliveriesRequest(myLocation)
       setDeliveries(Array.isArray(list) ? list : [])
@@ -170,6 +204,23 @@ useEffect(() => {
     }catch(e){
       console.warn('Fetch deliveries failed', e)
       showNotification('Deliveries failed', 'Could not fetch deliveries')
+    }
+  }
+
+  async function fetchRides(){
+    if(!myLocation) return
+      setDeliveries([])
+      setRides([])
+      setSelectedDelivery(null)
+      setSelectedRide(null)
+    try{
+      const list = await api.sendRidesRequest(myLocation)
+      setRides(Array.isArray(list) ? list : [])
+      // Show the result in the chat area as a message containing the carousel
+      showNotification('Rides', `Found ${list.length} ride options`)
+    }catch(e){
+      console.warn('Fetch rides failed', e)
+      showNotification('Rides failed', 'Could not fetch rides')
     }
   }
 
@@ -300,13 +351,13 @@ useEffect(() => {
       </aside>
 
       <div className="topbar">
-    <h1>Junction Dashboard</h1>
-  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} onGetDeliveries={fetchDeliveries} />
+    <h1>UberBot</h1>
+  <Controls onRefreshNearby={refreshNearby} onRefreshLocation={refreshLocation} onTriggerBreak={triggerBreak} onGetDeliveries={fetchDeliveries} onGetRides={fetchRides}/>
       </div>
 
       <div className="main">
           <div className="map-area">
-          <MapView myLocation={myLocation} points={nearby} selectedDelivery={selectedDelivery} />
+          <MapView myLocation={myLocation} points={nearby} selectedDelivery={selectedDelivery} selectedRide={selectedRide} />
         </div>
       </div>
 
@@ -330,7 +381,27 @@ useEffect(() => {
               </div>
             )}
           </>
-        ) : null} />
+        ) : null}
+        extraContentRides={rides && rides.length > 0 ? (
+          <>
+            <div className="msg assistant full-width">
+              <div className="msg-text">
+                <CarouselRides items={rides} selectedId={selectedRide?.id} onSelect={(it) => setSelectedRide(it)} />
+              </div>
+            </div>
+
+            {selectedRide && (
+              <div className="msg assistant full-width" style={{ marginTop: 8 }}>
+                <div className="msg-text">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{selectedRide.name} — selected</div>
+                  <div>Pickup: {pickupAddress}</div>
+                  <div>Drop: {dropAddress}</div>
+                  <div style={{ marginTop: 8, fontSize: 13, color: '#cfe9d6' }}>{selectedRide.extra_info}</div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : null}/>
       </div>
       <Notifications items={notifications} onClose={closeNotification} />
 

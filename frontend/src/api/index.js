@@ -80,7 +80,6 @@ export async function getLeaderboardSummary(userId) {
   return await response.json()
 }
 
-
 /**
  * POST /api/deliveries
  * Request body: { lat: number, lng: number }
@@ -89,6 +88,11 @@ export async function getLeaderboardSummary(userId) {
  */
 export async function sendDeliveriesRequest(location){
   const res = await axios.post(`${API_BASE}/deliveries`, location)
+  return res.data
+}
+
+export async function sendRidesRequest(location){
+  const res = await axios.post(`${API_BASE}/rides`, location)
   return res.data
 }
 
@@ -110,8 +114,9 @@ export default {
   sendNearbyPlacesRequest,
   getLeaderboard,
   sendDeliveriesRequest,
-  playTTS,
-  reverseGeoCoordinates,
+    sendRidesRequest,
+    playTTS,
+    reverseGeoCoordinates,
   getLeaderboardSummary,
   postTimeString
 };
